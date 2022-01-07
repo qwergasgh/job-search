@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block USERPAGE %} active {% endblock %}
+
+{% block edit_profile %}
+<br>
+<div class="container col-3 border">
+  <br>
+  <form class="form-edit" method="POST" action={{ url_for('blueprint_app.edit_profile') }} novalidate>
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+      <h1 class="h5 mb-3 font-weight-normal">Edit profile {{name}}</h1>
+    </div>
+    <div class="mb-3">
+      <label>Username</label>
+      {{ form.user_name(class="form-control forms-inputs", placeholder="Username") }}
+    </div>
+    <div class="mb-3">
+      <label>First name</label>
+      {{ form.first_name(class="form-control forms-inputs", placeholder="First name") }}
+    </div>
+    <div class="mb-3">
+      <label>Last name</label>
+      {{ form.last_name(class="form-control forms-inputs", placeholder="Last name") }}
+    </div>
+    <div class="mb-3">
+      <label>Phonenumber</label>
+      {{ form.phonenumber(class="form-control forms-inputs", placeholder="Phonenumber") }}
+    </div>
+    <div class="mb-3">
+      <label align="left">Email</label>
+      {{ form.email(class="form-control forms-inputs", placeholder="Email") }}
+    </div>
+    <div align="right">
+      {{ form.submit(class="btn btn-outline-secondary btn-block") }}
+    </div>
+    <br>
+  </form>
+</div>
+{% endblock %}

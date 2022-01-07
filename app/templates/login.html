@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block LOGINPAGE %} active {% endblock %}
+
+{% block signin %}
+<br>
+<div class="container col-3 border">
+  <br>
+  <form class="form-signin" method="POST" action={{ url_for('blueprint_app.login') }} novalidate>
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+      <h1 class="h5 mb-3 font-weight-normal">Please enter your login and password!</h1>
+    </div>
+    <div class="mb-3">
+      {{ form.email(class="form-control forms-inputs", placeholder="Email") }}
+    </div>
+    <div class="mb-3">
+      {{ form.password(class="form-control forms-inputs", placeholder="Password") }}
+    </div>
+    <div class="mb-3">
+      {{ form.submit(class="btn btn-outline-secondary btn-block") }}
+    </div>
+    <div align="right">
+      <p class="small mb-5 pb-lg-2"><a class="text-muted" href="#!">Forgot password?</a></p>
+      <p>Don't have an account? <a href={{ url_for('blueprint_app.register') }} class="link-info">Register here</a></p>
+    </div>
+  </form>
+</div>
+{% endblock %}

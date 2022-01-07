@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block SEARCHPAGE %} active {% endblock %}
+
+{% if jobs is not none %}
+{% block save %}
+    <li class="nav-item">
+        <a class="nav-link" href="/export?query={{ parametrs.query }}">
+            Save all to CSV
+            <img src="static/images/csv.png" alt="Save all to CSV" vspace="0" align="center" height="25px">
+        </a>
+    </li>
+{% endblock %}
+
+{% block table %}
+    <div class="container col-12" style="margin-top:15px;">
+        <table class="table table-striped table-hover border">
+            <thead>
+            <tr>
+                <td align="center" colspan="6"> 
+                <b>Searching for &laquo;{{ parametrs.query }}&raquo; found {{ count }}
+                    {% if count == 1 %}
+                        job
+                    {% else %}
+                        jobs.
+                    {% endif %}
+                    Showing page {{ jobs.page }} of {{ jobs.pages }}.
+                </b></td>
+            </tr>
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Company</th>
+                <th>Salary</th>
+                <th>Location</th>
+                <th>Link</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for job in jobs.items %}
+            <tr>
+                <td>{{ job.id }}</td>
+                <td>{{ job.title }}</td>
+                <td>{{ job.company }}</td>
+                <td>{{ job.salary }}</td>
+                <td>{{ job.location }}</td>
+                <td><a href="{{ job.link }}" target="_blank">Open</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% include 'paginator.html' %}
+    </div><br>
+{% endblock %}
+{% endif %}
