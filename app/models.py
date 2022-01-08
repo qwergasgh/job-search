@@ -25,6 +25,13 @@ class User(db.Model, UserMixin):
     created = db.Column(db.DateTime(), default=datetime.utcnow)
     updated = db.Column(db.DateTime(), default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    def __init__(self, **kwargs):
+        super(User, self).__init__(**kwargs)
+        if self.role_id is None:
+            self.role_id = Role.query.filter_by(default=False).first()
+        else:
+            self.role_id = Role.query.filter_by(default=True).first()
+
     @property
     def password(self):
         raise AttributeError('password is not a readable attribute')
@@ -48,7 +55,17 @@ class Favorites(db.Model):
      name = db.Column(db.String(80), nullable=False)
      users = db.relationship('User', backref='role')
      default = db.Column(db.Boolean, default=False, index=True)
-     permissions = db.Column(db.Integer)
+
+     @staticmethod
+     def insert_roles():
+         roles = { 'User': False, 'Administrator': True }
+         for r in roles:
+             role = Role.query.filter_by(name=r).first()
+             if role is None:
+                 role = Role(name=r)
+             role.default = roles[r][1]
+             db.session.add(role)
+         db.session.commit()
 
 @login.user_loader
 def user_loader(user_id):
