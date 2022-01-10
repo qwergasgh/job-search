@@ -8,9 +8,9 @@ class LoginForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(),
                                             Length(1, 64), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    first_name = StringField('First name', validators=[DataRequired()])
-    last_name = StringField('Last name', validators=[DataRequired()])
-    phonenumber = IntegerField('Phonenumber', validators=[DataRequired()])
+    #irst_name = StringField('First name', validators=[DataRequired()])
+    #last_name = StringField('Last name', validators=[DataRequired()])
+    #phonenumber = IntegerField('Phonenumber', validators=[DataRequired()])
     submit = SubmitField('Login')
 
     def __init__(self, *args, **kwargs):
@@ -18,6 +18,7 @@ class LoginForm(FlaskForm):
 
     def validate(self):
         initial_validation = super(LoginForm, self).validate()
+        print(initial_validation)
         if not initial_validation:
             return False
         user = User.query.filter_by(email=self.email.data).first()
@@ -95,6 +96,10 @@ class EditProfileForm(FlaskForm):
                                                                                       "dots or underscores")])
     email = EmailField('Email',
                        validators=[DataRequired(), Email(), Length(min=3, max=64)])
+    first_name = StringField('First name', validators=[DataRequired(), Length(min=3, max=64)])
+    last_name = StringField('Last name', validators=[DataRequired(), Length(min=3, max=64)])
+    phonenumber = StringField('Phonenumber', validators=[DataRequired(), Length(min=10, max=12),
+                                                         Regexp('[0-9]', 0, "Phonenumber must have only numbers")])
     # password = PasswordField('Password',
     #         validators=[DataRequired(), Length(min=8, max=64)])
     # confirm = PasswordField('Verify password',

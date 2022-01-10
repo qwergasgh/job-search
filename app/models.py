@@ -28,9 +28,9 @@ class User(db.Model, UserMixin):
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         if self.role_id is None:
-            self.role_id = Role.query.filter_by(default=False).first()
-        else:
-            self.role_id = Role.query.filter_by(default=True).first()
+            self.role_id = Role.query.filter_by(privilege=False).first().id
+        # else:
+        #    self.role_id = Role.query.filter_by(privilege=True).first()
 
     @property
     def password(self):
@@ -41,31 +41,26 @@ class User(db.Model, UserMixin):
         self.password_hash = generate_password_hash(password)
 
     def verify_password(self, password):
+        print("verify :", check_password_hash(self.password_hash, password), password)
         return check_password_hash(self.password_hash, password)
 
-class Favorites(db.Model):
+    def is_administrator(self):
+        if self.role_id == Role.query.filter_by(privilege=True).first().id:
+            return True
+        else:
+            return False
+
+class Favorite(db.Model):
     __tablename__ = 'favorites'
     id = db.Column(db.Integer, primary_key=True)
     id_user = db.Column(db.Integer, db.ForeignKey('users.id'))
     id_vacancy = db.Column(db.Integer, db.ForeignKey('vacancies.id'))
 
- class Role(db.Model):
-     __tablename__ = 'roles'
-     id = db.Column(db.Integer, primary_key=True)
-     name = db.Column(db.String(80), nullable=False)
-     users = db.relationship('User', backref='role')
-     default = db.Column(db.Boolean, default=False, index=True)
-
-     @staticmethod
-     def insert_roles():
-         roles = { 'User': False, 'Administrator': True }
-         for r in roles:
-             role = Role.query.filter_by(name=r).first()
-             if role is None:
-                 role = Role(name=r)
-             role.default = roles[r][1]
-             db.session.add(role)
-         db.session.commit()
+class Role(db.Model):
+    __tablename__ = 'roles'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(80), nullable=False)
+    privilege = db.Column(db.Boolean, index=True)
 
 @login.user_loader
 def user_loader(user_id):

@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, send_file, url_for, flash
+from flask import Blueprint, render_template, request, redirect, send_file, url_for, flash, abort
 from flask_login.utils import login_required, login_user, logout_user, current_user
-from .models import Job, User, Favorites
+from .models import Job, User, Favorite
 from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm
 from flask_wtf.csrf import CSRFError
 from app import db
@@ -55,8 +55,10 @@ def favorites():
 @blueprint_app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
+    print(form.password.data)
     if form.validate_on_submit():
         user = User.query.filter_by(email=request.form.get('email')).first()
+        print(form.password.data)
         if user is not None and user.verify_password(form.password.data):
             login_user(user)
             return redirect(url_for('blueprint_app.home'))
@@ -76,14 +78,23 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
-@blueprint_app.route('/logout')
+@blueprint_app.route('/user/logout')
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('blueprint_app.home'))
 
 
-@blueprint_app.route('/edit-profile', methods=['GET', 'POST'])
+@blueprint_app.route('/user/<username>')
+@login_required
+def user(username):
+    user = User.query.filter_by(user_name=username).first()
+    if user is None:
+        abort(404)
+    return render_template('user.html', user=user)
+
+
+@blueprint_app.route('/user/edit-profile', methods=['GET', 'POST'])
 @login_required
 def edit_profile():
     name = current_user.user_name

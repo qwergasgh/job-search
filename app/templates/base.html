@@ -2,8 +2,8 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <!--<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">-->
-        <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/css/bootstrap.min.css" integrity="sha384-zCbKRCUGaJDkqS1kPbPd7TveP5iyJE0EjAuZQTgFLD2ylzuqKfdKlfG/eSrtxUkn" crossorigin="anonymous">
+        <!--<link rel="stylesheet" href="/static/css/bootstrap.min.css">-->
         <title>{{ title }}</title>
     </head>
     <body class="bg-light text-center">
@@ -15,13 +15,13 @@
           <div class="collapse navbar-collapse justify-content-md-center" id="navbar">
             <ul class="navbar-nav">
               <li class="nav-item {% block HOMEPAGE %}{% endblock %}">
-                <a class="nav-link" href="/"><!--<span class="sr-only">(current)</span>-->
+                <a class="nav-link" href="{{ url_for('blueprint_app.home') }}"><!--<span class="sr-only">(current)</span>-->
                   Home
                   <!--<img src="static/img/homepage.png" alt="Home" vspace="0" align="center" height="25px">-->
                 </a>
               </li>
               <li class="nav-item {% block SEARCHPAGE %}{% endblock %}">
-                <a class="nav-link" aria-current="page" href="/search">
+                <a class="nav-link" aria-current="page" href="{{ url_for('blueprint_app.search') }}">
                   Search
                   <!--<img src="static/img/search.png" alt="Search" vspace="0" align="center" height="25px">-->
                 </a>
@@ -33,30 +33,31 @@
 
               {% if current_user.is_authenticated %}  
                 <li class="nav-item {% block FAVORITESPAGE %}{% endblock %}">
-                  <a class="nav-link" aria-current="page" href="/favorites">
+                  <a class="nav-link" aria-current="page" href="{{ url_for('blueprint_app.favorites') }}">
                     Favorites
                     <!--<img src="static/img/favorites.png" alt="Favorites" vspace="0" align="center" height="25px">-->
                   </a>
                 </li>
                 <li class="nav-item dropdown {% block USERPAGE %}{% endblock %}">
-                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink"
+                  <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink"
                     data-toggle="dropdown" aria-expanded="false">
                     <!--{{ current_user.user_name }}-->
-                    <img src="static/img/user.png" alt="Login" vspace="0" align="center" height="25px">
+                    <img src="static/img/user.png" alt="Account" vspace="0" align="center" height="25px">
                   </a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                    <a class="dropdown-item" href="/edit-profile">Edit profile</a>
-                    <a class="dropdown-item" href="/logout">Logout</a>
+                    <a class="dropdown-item" href="/user/{{ current_user.user_name }}">{{ current_user.user_name }}</a>
+                    <a class="dropdown-item" href="{{ url_for('blueprint_app.edit_profile') }}">Edit profile</a>
+                    <a class="dropdown-item" href="{{ url_for('blueprint_app.logout') }}">Logout</a>
                   </div>
                 </li>
               {% else %}
                 <li class="nav-item {% block LOGINPAGE %}{% endblock %}">
-                  <a class="nav-link" aria-current="page" href="/login">
+                  <a class="nav-link" aria-current="page" href="{{ url_for('blueprint_app.login') }}">
                     Login
                   </a>
                 </li>
                 <li class="nav-item {% block REGISTERPAGE %}{% endblock %}">
-                  <a class="nav-link" aria-current="page" href="/register">
+                  <a class="nav-link" aria-current="page" href="{{ url_for('blueprint_app.register') }}">
                     Registration
                   </a>
                 </li>
@@ -68,32 +69,14 @@
           </div>
         </nav>
 
-        {% block index %}
+        {% block page_content %}
         {% endblock %}
 
-        {% block searchform %}
-        {% endblock %}
-
-        {% block table %}
-        {% endblock %}
-
-        {% block signin %}
-        {% endblock %}
-
-        {% block register %}
-        {% endblock %}
-
-        {% block edit_profile %}
-        {% endblock %}
-
-        {% block error %}
-        {% endblock %}
-
-        <!--<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-fQybjgWLrvvRgtW6bFlB7jaZrFsaBXjsOMm/tB9LTS58ONXgqbR9W8oWht/amnpF" crossorigin="anonymous"></script>
-        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>-->
-        <script src="/static/js/bootstrap.bundle.min.js"
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+        <!--<script src="/static/js/bootstrap.bundle.min.js"
         <script src="/static/js/bootstrap.min.js"
-        <script src="/static/js/bootstrap.js"
+        <script src="/static/js/bootstrap.js"-->
       </body>
 </html>
