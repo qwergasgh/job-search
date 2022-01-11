@@ -33,6 +33,7 @@
                 <th>Company</th>
                 <th>Salary</th>
                 <th>Location</th>
+                <th>Favorites</th>
                 <th>Link</th>
             </tr>
             </thead>
@@ -44,6 +45,7 @@
                 <td>{{ job.company }}</td>
                 <td>{{ job.salary }}</td>
                 <td>{{ job.location }}</td>
+                <td><input id="{{job.id}}" type="button" class="btn btn-outline-secondary" value="add" name="add" onclick="status_vacancy({{job.id}})"></td>
                 <td><a href="{{ job.link }}" target="_blank">Open</a></td>
             </tr>
             {% endfor %}
@@ -53,3 +55,4 @@
     </div><br>
 {% endblock %}
 {% endif %}
+

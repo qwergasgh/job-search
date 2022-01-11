@@ -1,4 +1,5 @@
-from flask import Blueprint, render_template, request, redirect, send_file, url_for, flash, abort
+from flask import Blueprint, render_template, request, redirect, send_file, url_for, flash, abort, make_response
+from sqlalchemy.orm import query
 from flask_login.utils import login_required, login_user, logout_user, current_user
 from .models import Job, User, Favorite
 from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm
@@ -132,6 +133,23 @@ def export():
         return redirect(url_for('blueprint_app.home'))
 
 
+@blueprint_app.route('/status-favorite-vacancy', methods=['POST'])
+@login_required
+def status_favorite_vacancy():
+    try:
+        print(request.args)
+        id = request.args.get('id')
+        param = request.args.get('param')
+        print('id favorite -', id, 'param -', param)
+        if not id or param:
+            raise Exception()
+        resp = make_response('{"response": "ok"}')
+        resp.headers['Content-Type'] = "application/json"
+        return resp
+    except:
+        return redirect(url_for('blueprint_app.home'))
+
+
 @blueprint_app.errorhandler(404)
 def page_not_found(e):
     render_template('404.html', title="404 Not Found"), 404
@@ -140,3 +158,7 @@ def page_not_found(e):
 @blueprint_app.errorhandler(500)
 def internal_server_error(e):
     render_template('500.html', title="500 Server Error"), 500
+
+@blueprint_app.errorhandler(400)
+def bad_request(e):
+    render_template('400.html', title="400 Bad Request"), 400
