@@ -1,0 +1,7 @@
+db_files/createdb_favorites.py
+db_files/createdb_roles.py
+db_files/createdb_users.py
+db_files/__pycache__/reader_vacancies.cpython-39.pyc
+db_files/vacancies.csv
+db_files/reader_vacancies.py
+db_files/createdb_vacancies.py

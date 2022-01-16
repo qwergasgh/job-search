@@ -9,3 +9,5 @@ class BaseConfig:
     QSLALCHEMY_COMMIT_ON_TEARDOWN = True
     SECRET_KEY = 'my_secret_key'
     DEBUG = True
+
+# lol
