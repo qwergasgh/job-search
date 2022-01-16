@@ -146,8 +146,7 @@ def set_status_vacancy():
                 favorite_vacancy = Favorite(id_user=id_user, id_vacancy=id_vacancy)
                 db.session.add(favorite_vacancy)
             if param == 'delete':
-                favorite_vacancy.query.filter_by(id_user=id_user, id_vacancy=id_vacancy).first()
-                print(favorite_vacancy.id)
+                favorite_vacancy = Favorite.query.filter_by(id_user=id_user, id_vacancy=id_vacancy).first()
                 db.session.delete(favorite_vacancy)
             db.session.commit()
             return jsonify({'valid': "True"}), 201
