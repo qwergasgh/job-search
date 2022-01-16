@@ -6,13 +6,14 @@
 {% block save %}
     <li class="nav-item">
         <a class="nav-link" href="/export?query={{ parametrs.query }}">
-            Save all to CSV
-            <img src="static/images/csv.png" alt="Save all to CSV" vspace="0" align="center" height="25px">
+            <!--Save all to CSV-->
+            <img src="static/img/csv.png" alt="Save all to CSV" vspace="0" align="center" height="25px">
         </a>
     </li>
 {% endblock %}
 
 {% block page_content %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
     <div class="container col-12" style="margin-top:15px;">
         <table class="table table-striped table-hover border">
             <thead>

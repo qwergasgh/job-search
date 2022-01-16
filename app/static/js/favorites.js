@@ -1,3 +1,14 @@
+var csrftoken = $('meta[name=csrf-token]').attr('content')
+
+$.ajaxSetup({
+    beforeSend: function(xhr, settings) {
+        if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type)) {
+            xhr.setRequestHeader("X-CSRFToken", csrftoken)
+        }
+    }
+})
+
+
 function status_vacancy(id) {
     id_vacancy = id.toString();
     if (document.getElementById(id_vacancy).value == 'add') {
@@ -12,7 +23,7 @@ function status_vacancy(id) {
 
 
 function set_database(id_vacancy, func_param) {
-    console.log(id_vacancy, func_param)
+    // console.log(id_vacancy, func_param)
     $.ajax({
         type: 'POST',
         url: '/report/set-status-vacancy',
@@ -22,7 +33,7 @@ function set_database(id_vacancy, func_param) {
             console.log(response.status + ' ' + response.valid);
         },
         error: function(error) {
-            console.log(error);
+            // console.log(error);
             console.log(error.status + ' ' + error.valid);
         }
     });

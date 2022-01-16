@@ -3,7 +3,7 @@ from sqlalchemy.orm import query
 from flask_login.utils import login_required, login_user, logout_user, current_user
 from .models import Job, User, Favorite
 from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm
-from flask_wtf.csrf import CSRFError
+from flask_wtf.csrf import CSRFError, CSRF
 from app import db
 
 blueprint_app = Blueprint('blueprint_app', __name__,
@@ -133,9 +133,11 @@ def export():
         return redirect(url_for('blueprint_app.home'))
 
 
+#@csrf.exempt
 @blueprint_app.route('/report/set-status-vacancy', methods=['POST'])
 @login_required
 def set_status_vacancy():
+    print("in func")
     try:
         print('json', request.json)
         if request.method == 'POST':
