@@ -1,0 +1,11 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "database": "${workspaceFolder:JobSearch}/app/db_app.db",
+            "name": "name"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
+}

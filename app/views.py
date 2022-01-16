@@ -137,13 +137,19 @@ def export():
 @blueprint_app.route('/report/set-status-vacancy', methods=['POST'])
 @login_required
 def set_status_vacancy():
-    print("in func")
     try:
-        print('json', request.json)
         if request.method == 'POST':
-            print('json', request.json)
-            id = request.json['id']
+            id_user = current_user.id
+            id_vacancy = int(request.json['id'])
             param = request.json['param']
+            if param == 'add':
+                favorite_vacancy = Favorite(id_user=id_user, id_vacancy=id_vacancy)
+                db.session.add(favorite_vacancy)
+            if param == 'delete':
+                favorite_vacancy.query.filter_by(id_user=id_user, id_vacancy=id_vacancy).first()
+                print(favorite_vacancy.id)
+                db.session.delete(favorite_vacancy)
+            db.session.commit()
             return jsonify({'valid': "True"}), 201
     except:
         return jsonify({'valid': "False"}), 400
