@@ -49,8 +49,16 @@ def report():
 @blueprint_app.route('/favorites', methods=['GET', 'POST'])
 @login_required
 def favorites():
-    jobs = None
-    return render_template('favorites.html', jobs=jobs)
+    page = request.args.get('page', 1, type=int)
+    vacancies_favorites = Favorite.query.filter_by(id_user=current_user.id)
+    id_list = []
+    for v in vacancies_favorites:
+        id_list.append(v.id_vacancy)
+    jobs_filter = Job.query.filter(Job.id.in_(id_list))
+    #jobs = jobs_filter.paginate(page=page, per_page=ROWS_PAGINATOR)
+    jobs = jobs_filter
+    title = f'Favorites vacancies {page} page'
+    return render_template('favorites.html', title=title, count=666, jobs=jobs)
 
 
 @blueprint_app.route('/login', methods=['GET', 'POST'])

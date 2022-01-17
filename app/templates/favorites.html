@@ -4,9 +4,9 @@
 
 {% block save %}
     <li class="nav-item">
-        <a class="nav-link" href="/export?query={{ parametrs.query }}">
-            Save favorites to CSV
-            <img src="static/images/csv.png" alt="Save favorites to CSV" vspace="0" align="center" height="25px">
+        <a class="nav-link" href="/export?">
+            <!--Save favorites to CSV-->
+            <img src="static/img/csv.png" alt="Save favorites to CSV" vspace="0" align="center" height="25px">
         </a>
     </li>
 {% endblock %}
@@ -15,12 +15,12 @@
     <div class="container col-12" style="margin-top:15px;">
         <table class="table table-striped table-hover border">
             <thead>
-            <tr>
+            <!--<tr>
                 <td align="center" colspan="6"> 
                 <b>Your favorites of vacancies. Showing page {{ jobs.page }} of {{ jobs.pages }}.
                 </b></td>
             </tr>
-            <tr>
+            <tr>-->
                 <th>Id</th>
                 <th>Title</th>
                 <th>Company</th>
@@ -30,7 +30,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for job in jobs.items %}
+            {% for job in jobs %}
             <tr>
                 <td>{{ job.id }}</td>
                 <td>{{ job.title }}</td>
@@ -42,6 +42,6 @@
             {% endfor %}
             </tbody>
         </table>
-    {% include 'paginator.html' %}
+    <!-- paginator -->
     </div><br>
 {% endblock %}
