@@ -15,12 +15,12 @@
     <div class="container col-12" style="margin-top:15px;">
         <table class="table table-striped table-hover border">
             <thead>
-            <!--<tr>
+            <tr>
                 <td align="center" colspan="6"> 
                 <b>Your favorites of vacancies. Showing page {{ jobs.page }} of {{ jobs.pages }}.
                 </b></td>
             </tr>
-            <tr>-->
+            <tr>
                 <th>Id</th>
                 <th>Title</th>
                 <th>Company</th>
@@ -30,7 +30,7 @@
             </tr>
             </thead>
             <tbody>
-            {% for job in jobs %}
+            {% for job in jobs.items %}
             <tr>
                 <td>{{ job.id }}</td>
                 <td>{{ job.title }}</td>
@@ -42,6 +42,6 @@
             {% endfor %}
             </tbody>
         </table>
-    <!-- paginator -->
+    {% include 'paginator.html' %}
     </div><br>
 {% endblock %}

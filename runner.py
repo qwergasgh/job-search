@@ -1,14 +1,12 @@
-from app import app, db
+from flask_migrate import Migrate, MigrateCommand
 from app.models import Job, Favorite, User
 from flask_script import Manager, Shell
-
-from flask_migrate import Migrate, MigrateCommand
-
+from app import app, db
 
 manager = Manager(app)
 
-
 migrate = Migrate(app, db)
+
 
 def make_shell_context():
     return dict(app=app, db=db, Job=Job, User=User, Favorite=Favorite)

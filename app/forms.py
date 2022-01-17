@@ -1,16 +1,17 @@
-from flask_wtf import FlaskForm
 from wtforms import PasswordField, SubmitField, StringField, IntegerField, BooleanField, EmailField
 from wtforms.validators import DataRequired, Email, Length, Regexp, EqualTo
+from flask_wtf import FlaskForm
 from .models import User
 
 
 class LoginForm(FlaskForm):
     email = EmailField('Email', validators=[DataRequired(),
-                                            Length(1, 64), Email()])
+                                            Length(1, 64),
+                                            Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    #irst_name = StringField('First name', validators=[DataRequired()])
-    #last_name = StringField('Last name', validators=[DataRequired()])
-    #phonenumber = IntegerField('Phonenumber', validators=[DataRequired()])
+    # first_name = StringField('First name', validators=[DataRequired()])
+    # last_name = StringField('Last name', validators=[DataRequired()])
+    # phonenumber = IntegerField('Phonenumber', validators=[DataRequired()])
     submit = SubmitField('Login')
 
     def __init__(self, *args, **kwargs):
@@ -89,8 +90,7 @@ class SearchForm(FlaskForm):
 
 class EditProfileForm(FlaskForm):
     user_name = StringField('Username',
-                            validators=[DataRequired(), Length(min=3, max=64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$',
-                                                                                      0,
+                            validators=[DataRequired(), Length(min=3, max=64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
                                                                                       "Usernames must have only "
                                                                                       "letters, numbers, "
                                                                                       "dots or underscores")])
