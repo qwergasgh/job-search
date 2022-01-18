@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, redirect, send_file, url_
 from flask_login.utils import login_required, login_user, logout_user, current_user
 from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm
 from .models import Job, User, Favorite
+from utils import parsing_vacancies
 from app import db
 
 blueprint_app = Blueprint('blueprint_app', __name__,
@@ -40,6 +41,9 @@ def report():
     title = f'Searching results {page} page'
     parametrs = {'query': query, 'headhunter': headhunter, 'stackoverflow': stackoverflow,
                  'city': city, 'state': state, 'salary': salary}
+    # parsing
+    parsing_vacancies(parametrs)
+    #####
     favorite_vacancies = {}
     for job in jobs.items:
         favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id, id_vacancy=job.id).first()
@@ -63,7 +67,6 @@ def favorites():
     jobs_filter = Job.query.filter(Job.id.in_(id_list))
     page = request.args.get('page', 1, type=int)
     jobs = jobs_filter.paginate(page=page, per_page=ROWS_PAGINATOR)
-    #jobs = jobs_filter
     page = request.args.get('page', 1, type=int)
     title = f'Favorites vacancies {page} page'
     return render_template('favorites.html', title=title, count=666, jobs=jobs)
