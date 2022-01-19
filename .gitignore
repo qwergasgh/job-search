@@ -6,3 +6,16 @@ db_files/vacancies.csv
 db_files/reader_vacancies.py
 db_files/createdb_vacancies.py
 db_files/db_app.db.zip
+app/tmp/favorites_vacancies_for_usernme.csv
+app/tmp/vacancies_for_usernme.csv
+app/__pycache__/utils.cpython-39.pyc
+__pycache__/config.cpython-39.pyc
+__pycache__/config.cpython-39.pyc
+app/__pycache__/__init__.cpython-39.pyc
+app/__pycache__/forms.cpython-39.pyc
+app/__pycache__/models.cpython-39.pyc
+app/__pycache__/views.cpython-39.pyc
+app/__pycache__/views.cpython-39.pyc
+app/__pycache__/models.cpython-39.pyc
+app/__pycache__/forms.cpython-39.pyc
+app/__pycache__/__init__.cpython-39.pyc

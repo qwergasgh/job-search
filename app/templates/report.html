@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 
-{% block SEARCHPAGE %} active {% endblock %}
 
 {% if jobs is not none %}
+
 {% block save %}
     <li class="nav-item">
-        <a class="nav-link" href="/export?query={{ parametrs.query }}">
+        <a class="nav-link" href="/export?vacancies=all">
             <!--Save all to CSV-->
             <img src="static/img/csv.png" alt="Save all to CSV" vspace="0" align="center" height="25px">
         </a>
@@ -19,7 +19,7 @@
             <thead>
             <tr>
                 <td align="center" colspan="6"> 
-                <b>Searching for &laquo;{{ parametrs.query }}&raquo; found {{ count }}
+                <b>Searching for &laquo;{{ parametrs.query }}&raquo; found {{ parametrs.count }}
                     {% if count == 1 %}
                         job
                     {% else %}
@@ -29,7 +29,7 @@
                 </b></td>
             </tr>
             <tr>
-                <th>Id</th>
+                <!--<th>Number</th>-->
                 <th>Title</th>
                 <th>Company</th>
                 <th>Salary</th>
@@ -41,7 +41,7 @@
             <tbody>
             {% for job in jobs.items %}
             <tr>
-                <td>{{ job.id }}</td>
+                <!--<td>{{ job.id }}</td>-->
                 <td>{{ job.title }}</td>
                 <td>{{ job.company }}</td>
                 <td>{{ job.salary }}</td>

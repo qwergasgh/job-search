@@ -4,7 +4,7 @@
 
 {% block save %}
     <li class="nav-item">
-        <a class="nav-link" href="/export?">
+        <a class="nav-link" href="/export?vacancies=favorites">
             <!--Save favorites to CSV-->
             <img src="static/img/csv.png" alt="Save favorites to CSV" vspace="0" align="center" height="25px">
         </a>
@@ -17,11 +17,11 @@
             <thead>
             <tr>
                 <td align="center" colspan="6"> 
-                <b>Your favorites of vacancies. Showing page {{ jobs.page }} of {{ jobs.pages }}.
+                <b>Your favorites of vacancies{% if paginate %}. Showing page {{ jobs.page }} of {{ jobs.pages }}.{% endif %}
                 </b></td>
             </tr>
             <tr>
-                <th>Id</th>
+                <!--<th>Id</th>-->
                 <th>Title</th>
                 <th>Company</th>
                 <th>Salary</th>
@@ -30,9 +30,10 @@
             </tr>
             </thead>
             <tbody>
+            {% if paginate %}
             {% for job in jobs.items %}
             <tr>
-                <td>{{ job.id }}</td>
+                <!--<td>{{ job.id }}</td>-->
                 <td>{{ job.title }}</td>
                 <td>{{ job.company }}</td>
                 <td>{{ job.salary }}</td>
@@ -40,8 +41,20 @@
                 <td><a href="{{ job.link }}" target="_blank">Open</a></td>
             </tr>
             {% endfor %}
+            {% else %}
+            {% for job in jobs %}
+            <tr>
+                <!--<td>{{ job.id }}</td>-->
+                <td>{{ job.title }}</td>
+                <td>{{ job.company }}</td>
+                <td>{{ job.salary }}</td>
+                <td>{{ job.location }}</td>
+                <td><a href="{{ job.link }}" target="_blank">Open</a></td>
+            </tr>
+            {% endfor %}
+            {% endif %}
             </tbody>
         </table>
-    {% include 'paginator.html' %}
+        {% if paginate %}{% include 'paginator.html' %}{% endif %}
     </div><br>
 {% endblock %}

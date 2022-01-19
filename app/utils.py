@@ -9,13 +9,17 @@ import os
 
 
 
-def save_to_csv(vacancies, file='vacancies'):
-    with open(f'{file}.csv', mode='w', encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerow(['Title', 'Company', 'Salary', 'Location', 'Link'])
-        for vacancy in vacancies:
-            writer.writerow([vacancy.title, vacancy.company, vacancy.salary, 
-                             vacancy.location, vacancy.link])
+def save_to_csv(vacancies, file):
+    try:
+        with open(file, mode='w', encoding='utf-8') as file:
+            writer = csv.writer(file)
+            writer.writerow(['Title', 'Company', 'Salary', 'Location', 'Link'])
+            for vacancy in vacancies:
+                writer.writerow([vacancy.title, vacancy.company, vacancy.salary, 
+                                vacancy.location, vacancy.link])
+        return True
+    except:
+        return False
 
 def parsing_vacancies(parametrs):
     print("parsing")

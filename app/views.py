@@ -1,9 +1,11 @@
+import os
 from flask import Blueprint, render_template, request, redirect, send_file, url_for, abort, jsonify
 from flask_login.utils import login_required, login_user, logout_user, current_user
 from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm
 from .models import Job, User, Favorite
-from utils import parsing_vacancies
+from .utils import parsing_vacancies, save_to_csv
 from app import db
+import os
 
 blueprint_app = Blueprint('blueprint_app', __name__,
                           template_folder='templates', static_folder='static')
@@ -39,19 +41,22 @@ def report():
     page = request.args.get('page', 1, type=int)
     jobs = Job.query.paginate(page=page, per_page=ROWS_PAGINATOR)
     title = f'Searching results {page} page'
-    parametrs = {'query': query, 'headhunter': headhunter, 'stackoverflow': stackoverflow,
-                 'city': city, 'state': state, 'salary': salary}
     # parsing
-    parsing_vacancies(parametrs)
+    # parsing_vacancies(parametrs)
     #####
+    id_jobs = []
     favorite_vacancies = {}
     for job in jobs.items:
-        favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id, id_vacancy=job.id).first()
+        id = job.id
+        id_jobs.append(id)
+        favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id, id_vacancy=id).first()
         if favorite_vacancy is None:
             favorite_vacancies[job.id] = 'add'
         else:
             favorite_vacancies[job.id] = 'delete'
-    return render_template('report.html', title=title, parametrs=parametrs, count=666,
+    parametrs = {'query': query, 'headhunter': headhunter, 'stackoverflow': stackoverflow,
+                 'city': city, 'state': state, 'salary': salary, 'id_jobs': id_jobs, 'count': len(id_jobs)}
+    return render_template('report.html', title=title, parametrs=parametrs,
                            jobs=jobs, favorite_vacancies=favorite_vacancies)
 
 
@@ -65,11 +70,16 @@ def favorites():
     if len(id_list) == 0:
         return redirect(url_for('blueprint_app.report'))
     jobs_filter = Job.query.filter(Job.id.in_(id_list))
-    page = request.args.get('page', 1, type=int)
-    jobs = jobs_filter.paginate(page=page, per_page=ROWS_PAGINATOR)
-    page = request.args.get('page', 1, type=int)
-    title = f'Favorites vacancies {page} page'
-    return render_template('favorites.html', title=title, count=666, jobs=jobs)
+    if len(id_list) > ROWS_PAGINATOR:
+        page = request.args.get('page', 1, type=int)
+        jobs = jobs_filter.paginate(page=page, per_page=ROWS_PAGINATOR)
+        title = f'Favorites vacancies {page} page'
+        paginate = True
+    else:
+        jobs = jobs_filter
+        title = 'Favorites vacancies'
+        paginate = False
+    return render_template('favorites.html', title=title, jobs=jobs, paginate=paginate)
 
 
 @blueprint_app.route('/login', methods=['GET', 'POST'])
@@ -143,11 +153,28 @@ def edit_profile():
 @login_required
 def export():
     try:
-        query = request.args.get('query')
-        if not query:
+        type = request.args.get('vacancies')
+        if type is None:
             raise Exception()
-        query.lower()
-        return send_file("vacancies.csv")
+        if type == 'all':
+            vacancies = Job.query.all()
+            name = 'vacancies'
+        if type == 'favorites':
+            vacancies_favorites = Favorite.query.filter_by(id_user=current_user.id)
+            id_list = []
+            for v in vacancies_favorites:
+                id_list.append(v.id_vacancy)
+            if len(id_list) == 0:
+                return redirect(url_for('blueprint_app.favorites'))
+            vacancies = Job.query.filter(Job.id.in_(id_list))
+            name = 'favorites_vacancies'
+        if vacancies is None:
+            raise Exception()
+        file = os.path.abspath(os.path.dirname(__file__)) + f'/tmp/{name}_for_{current_user.user_name}.csv'
+        if save_to_csv(vacancies, file):
+            return send_file(file)
+        else:
+            raise Exception()
     except:
         return redirect(url_for('blueprint_app.home'))
 
@@ -167,7 +194,7 @@ def set_status_vacancy():
                 favorite_vacancy = Favorite.query.filter_by(id_user=id_user, id_vacancy=id_vacancy).first()
                 db.session.delete(favorite_vacancy)
             db.session.commit()
-            return jsonify({'valid': 'True'}), 201
+            return jsonify({'valid': 'True'}), 200
     except:
         return jsonify({'valid': 'False'}), 400
 
