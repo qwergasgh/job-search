@@ -28,7 +28,7 @@ def search():
         return redirect(url_for('blueprint_app.report', form=form))
     return render_template('search_form.html', title='Job search', form=form)
 
-
+# edit count, jobs <-- query db
 @blueprint_app.route('/report', methods=['GET', 'POST'])
 @login_required
 def report():
@@ -38,9 +38,16 @@ def report():
     city = request.form.get('city')
     state = request.form.get('state')
     salary = request.form.get('salary')
-    page = request.args.get('page', 1, type=int)
-    jobs = Job.query.paginate(page=page, per_page=ROWS_PAGINATOR)
-    title = f'Searching results {page} page'
+    count = Job.query.count()
+    if count > ROWS_PAGINATOR:
+        page = request.args.get('page', 1, type=int)
+        jobs = Job.query.paginate(page=page, per_page=ROWS_PAGINATOR)
+        title = f'Searching results {page} page'
+        paginate = True
+    else:
+        jobs = Job.query.all()
+        title = 'Searching results'
+        paginate = False
     # parsing
     # parsing_vacancies(parametrs)
     #####
@@ -49,15 +56,26 @@ def report():
     for job in jobs.items:
         id = job.id
         id_jobs.append(id)
-        favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id, id_vacancy=id).first()
+        favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id, 
+                                                    id_vacancy=id).first()
         if favorite_vacancy is None:
             favorite_vacancies[job.id] = 'add'
         else:
             favorite_vacancies[job.id] = 'delete'
-    parametrs = {'query': query, 'headhunter': headhunter, 'stackoverflow': stackoverflow,
-                 'city': city, 'state': state, 'salary': salary, 'id_jobs': id_jobs, 'count': len(id_jobs)}
-    return render_template('report.html', title=title, parametrs=parametrs,
-                           jobs=jobs, favorite_vacancies=favorite_vacancies)
+    parametrs = {'query': query,
+                 'headhunter': headhunter, 
+                 'stackoverflow': stackoverflow, 
+                 'city': city, 
+                 'state': state, 
+                 'salary': salary, 
+                 'id_jobs': id_jobs, 
+                 'count': count, 
+                 'paginate': paginate, 
+                 'title': title,
+                 'jobs': jobs, 
+                 'favorite_vacancies': favorite_vacancies}
+    
+    return render_template('report.html', parametrs=parametrs)
 
 
 @blueprint_app.route('/favorites', methods=['GET', 'POST'])
@@ -79,7 +97,8 @@ def favorites():
         jobs = jobs_filter
         title = 'Favorites vacancies'
         paginate = False
-    return render_template('favorites.html', title=title, jobs=jobs, paginate=paginate)
+    parametrs = {'title': title, 'paginate': paginate, 'jobs': jobs}
+    return render_template('favorites.html', parametrs=parametrs)
 
 
 @blueprint_app.route('/login', methods=['GET', 'POST'])

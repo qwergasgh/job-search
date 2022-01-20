@@ -1,15 +1,15 @@
 <!-- Pagination Links-->
 <div align="right">
-    <a href="{{ url_for('blueprint_app.report', page=jobs.prev_num) }}"
+    <a href="{{ url_for('blueprint_app.report', page=parametrs.jobs.prev_num) }}"
     class="btn btn-outline-secondary 
-    {% if jobs.page == 1 %}disabled{% endif %}">
+    {% if parametrs.jobs.page == 1 %}disabled{% endif %}">
         &laquo;
     </a>
     <!-- Loop through the number of pages to display a link for each-->
-    {% for page_num in jobs.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+    {% for page_num in parametrs.jobs.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
         {% if page_num %}
             <!-- Check for the active page and set the link to "Active"-->
-            {% if jobs.page == page_num %}
+            {% if parametrs.jobs.page == page_num %}
                 <a href="{{ url_for('blueprint_app.report', page=page_num) }}"
                 class="btn btn-outline-secondary">
                     {{ page_num }}
@@ -24,9 +24,9 @@
                 ...
         {% endif %}
     {% endfor %}    
-    <a href="{{ url_for('blueprint_app.report', page=jobs.next_num) }}"
+    <a href="{{ url_for('blueprint_app.report', page=parametrs.jobs.next_num) }}"
     class="btn btn-outline-secondary
-    {% if jobs.page == jobs.pages %}disabled{% endif %}">
+    {% if parametrs.jobs.page == parametrs.jobs.pages %}disabled{% endif %}">
         &raquo;
     </a><br>
 </div>

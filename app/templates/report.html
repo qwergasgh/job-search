@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 
-{% if jobs is not none %}
+{% if parametrs.jobs is not none %}
 
 {% block save %}
     <li class="nav-item">
@@ -20,12 +20,12 @@
             <tr>
                 <td align="center" colspan="6"> 
                 <b>Searching for &laquo;{{ parametrs.query }}&raquo; found {{ parametrs.count }}
-                    {% if count == 1 %}
+                    {% if parametrs.count == 1 %}
                         job
                     {% else %}
                         jobs.
                     {% endif %}
-                    Showing page {{ jobs.page }} of {{ jobs.pages }}.
+                    {% if parametrs.paginate %}Showing page {{ parametrs.jobs.page }} of {{ parametrs.jobs.pages }}.{% endif %}
                 </b></td>
             </tr>
             <tr>
@@ -39,7 +39,8 @@
             </tr>
             </thead>
             <tbody>
-            {% for job in jobs.items %}
+            {% if parametrs.paginate %}
+            {% for job in parametrs.jobs.items %}
             <tr>
                 <!--<td>{{ job.id }}</td>-->
                 <td>{{ job.title }}</td>
@@ -47,14 +48,29 @@
                 <td>{{ job.salary }}</td>
                 <td>{{ job.location }}</td>
                 <td><input id="{{job.id}}" type="button" class="btn btn-outline-secondary"
-                           value="{{favorite_vacancies[job.id]}}" name="status_vacancy_name"
+                           value="{{parametrs.favorite_vacancies[job.id]}}" name="status_vacancy_name"
                            onclick="status_vacancy({{job.id}})"></td>
                 <td><a href="{{ job.link }}" target="_blank">Open</a></td>
             </tr>
             {% endfor %}
+            {% else %}
+            {% for job in parametrs.jobs %}
+            <tr>
+                <!--<td>{{ job.id }}</td>-->
+                <td>{{ job.title }}</td>
+                <td>{{ job.company }}</td>
+                <td>{{ job.salary }}</td>
+                <td>{{ job.location }}</td>
+                <td><input id="{{job.id}}" type="button" class="btn btn-outline-secondary"
+                           value="{{parametrs.favorite_vacancies[job.id]}}" name="status_vacancy_name"
+                           onclick="status_vacancy({{job.id}})"></td>
+                <td><a href="{{ job.link }}" target="_blank">Open</a></td>
+            </tr>
+            {% endfor %}
+            {% endif %}
             </tbody>
         </table>
-    {% include 'paginator.html' %}
+        {% if parametrs.paginate %}{% include 'paginator.html' %}{% endif %}
     </div><br>
 {% endblock %}
 {% endif %}
