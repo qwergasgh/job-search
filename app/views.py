@@ -16,9 +16,7 @@ ROWS_PAGINATOR = 20
 
 @blueprint_app.route('/')
 @login_required
-def home():
-    # print(request.headers)
-    # print('\n\n\n ip =', request.remote_addr) 
+def home(): 
     return render_template('index.html', title='Job search')
 
 
@@ -41,14 +39,14 @@ def search():
                      'salary': salary }
         parsing = threading.Thread(target=parsing_vacancies, args=(parametrs,))
         parsing.start()
-        # return redirect(url_for('blueprint_app.report', form=form))
     return render_template('search_form.html', title='Job search', form=form)
 
-# edit count, jobs <-- query db
+
 @blueprint_app.route('/report', methods=['GET', 'POST'])
 @login_required
 def report():
-    query = request.form.get('query_search')
+    # query = request.form.get('query_search')
+    query = None
     count = Job.query.count()
     if count > ROWS_PAGINATOR:
         page = request.args.get('page', 1, type=int)
@@ -74,11 +72,10 @@ def report():
                  'id_jobs': id_jobs, 
                  'count': count, 
                  'paginate': paginate, 
-                 'title': title,
                  'jobs': jobs, 
                  'favorite_vacancies': favorite_vacancies}
     
-    return render_template('report.html', parametrs=parametrs)
+    return render_template('report.html', parametrs=parametrs, title=title)
 
 
 @blueprint_app.route('/favorites', methods=['GET', 'POST'])
@@ -100,8 +97,8 @@ def favorites():
         jobs = jobs_filter
         title = 'Favorites vacancies'
         paginate = False
-    parametrs = {'title': title, 'paginate': paginate, 'jobs': jobs}
-    return render_template('favorites.html', parametrs=parametrs)
+    parametrs = {'paginate': paginate, 'jobs': jobs}
+    return render_template('favorites.html', parametrs=parametrs, title=title)
 
 
 @blueprint_app.route('/login', methods=['GET', 'POST'])
@@ -143,7 +140,7 @@ def user(username):
     user = User.query.filter_by(user_name=username).first()
     if user is None:
         abort(404)
-    return render_template('user.html', user=user)
+    return render_template('user.html', user=user, title='User page')
 
 
 @blueprint_app.route('/user/edit-profile', methods=['GET', 'POST'])
@@ -226,7 +223,6 @@ def progress():
     percentge = get_percentage()
     if percentge == 100:
         update_persentage()
-        # return redirect(url_for('blueprint_app.report'))
     return jsonify({'percentage': percentge}), 200
 
 

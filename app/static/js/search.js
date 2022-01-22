@@ -32,7 +32,7 @@ $('#form_search').on('submit', function(event){
                         document.location.href = '/report';
                     }
                 });
-            }, 10000);
+            }, 5000);
         },
         error: function(error) {
             console.log(error);
