@@ -1,13 +1,8 @@
-from selenium.webdriver import Firefox
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.service import Service
-from subprocess import Popen, PIPE
-from bs4 import BeautifulSoup
-import fake_useragent
+from flask import redirect, url_for
 import csv
-import os
+import time
 
-
+PERCENTAGE = 0
 
 def save_to_csv(vacancies, file):
     try:
@@ -22,4 +17,14 @@ def save_to_csv(vacancies, file):
         return False
 
 def parsing_vacancies(parametrs):
-    print("parsing")
+    global PERCENTAGE
+    while PERCENTAGE < 100:
+        time.sleep(1)
+        PERCENTAGE += 1
+
+def update_persentage():
+    global PERCENTAGE
+    PERCENTAGE = 0
+
+def get_percentage():
+    return PERCENTAGE

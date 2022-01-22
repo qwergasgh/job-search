@@ -73,5 +73,10 @@
         {% if parametrs.paginate %}{% include 'paginator.html' %}{% endif %}
     </div><br>
 {% endblock %}
+
+{% block script %}
+<script src="/static/js/favorites.js"></script>
+{% endblock %}
+
 {% endif %}
 

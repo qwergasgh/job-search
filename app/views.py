@@ -1,11 +1,13 @@
-import os
 from flask import Blueprint, render_template, request, redirect, send_file, url_for, abort, jsonify
 from flask_login.utils import login_required, login_user, logout_user, current_user
 from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm
 from .models import Job, User, Favorite
-from .utils import parsing_vacancies, save_to_csv
+from .utils import parsing_vacancies, save_to_csv, get_percentage, update_persentage
 from app import db
+import threading
 import os
+
+
 
 blueprint_app = Blueprint('blueprint_app', __name__,
                           template_folder='templates', static_folder='static')
@@ -25,7 +27,21 @@ def home():
 def search():
     form = SearchForm()
     if form.validate_on_submit():
-        return redirect(url_for('blueprint_app.report', form=form))
+        query = request.form.get('query_search')
+        headhunter = request.form.get('headhunter')
+        stackoverflow = request.form.get('stackoverflow')
+        city = request.form.get('city')
+        state = request.form.get('state')
+        salary = request.form.get('salary')
+        parametrs = {'query': query,
+                     'headhunter': headhunter, 
+                     'stackoverflow': stackoverflow, 
+                     'city': city, 
+                     'state': state, 
+                     'salary': salary }
+        parsing = threading.Thread(target=parsing_vacancies, args=(parametrs,))
+        parsing.start()
+        # return redirect(url_for('blueprint_app.report', form=form))
     return render_template('search_form.html', title='Job search', form=form)
 
 # edit count, jobs <-- query db
@@ -33,11 +49,6 @@ def search():
 @login_required
 def report():
     query = request.form.get('query_search')
-    headhunter = request.form.get('headhunter')
-    stackoverflow = request.form.get('stackoverflow')
-    city = request.form.get('city')
-    state = request.form.get('state')
-    salary = request.form.get('salary')
     count = Job.query.count()
     if count > ROWS_PAGINATOR:
         page = request.args.get('page', 1, type=int)
@@ -48,9 +59,6 @@ def report():
         jobs = Job.query.all()
         title = 'Searching results'
         paginate = False
-    # parsing
-    # parsing_vacancies(parametrs)
-    #####
     id_jobs = []
     favorite_vacancies = {}
     for job in jobs.items:
@@ -63,11 +71,6 @@ def report():
         else:
             favorite_vacancies[job.id] = 'delete'
     parametrs = {'query': query,
-                 'headhunter': headhunter, 
-                 'stackoverflow': stackoverflow, 
-                 'city': city, 
-                 'state': state, 
-                 'salary': salary, 
                  'id_jobs': id_jobs, 
                  'count': count, 
                  'paginate': paginate, 
@@ -216,6 +219,15 @@ def set_status_vacancy():
             return jsonify({'valid': 'True'}), 200
     except:
         return jsonify({'valid': 'False'}), 400
+
+
+@blueprint_app.route('/search/parsing')
+def progress():
+    percentge = get_percentage()
+    if percentge == 100:
+        update_persentage()
+        # return redirect(url_for('blueprint_app.report'))
+    return jsonify({'percentage': percentge}), 200
 
 
 @blueprint_app.errorhandler(404)
