@@ -7,6 +7,8 @@ import fake_useragent
 import os
 import csv
 import time
+import requests
+
 
 PERCENTAGE = 0
 
@@ -37,8 +39,7 @@ def get_percentage():
 
 
 class ParsingQuery():
-    def __init__(self, query):
-        self.query = query
+    def __init__(self):
         self.percentage = 0
         self.gecko_path = os.path.abspath(os.path.dirname(__file__)) + '/geckodriver'
         self.binary_path = '/usr/bin/firefox'
@@ -82,12 +83,68 @@ class ParsingQuery():
             self.tor.kill()
             print('tor closed\ntor exit code = ' + str(self.tor.poll()))
 
-
+    def get_parametrs_for_parsing(self):
+        parametrs_for_parsing = {'options': self.options,
+                                 'service': self.service}
+        return parametrs_for_parsing
 
 # with Firefox(options=options, service=service) as driver:
 #    driver.get(url=URL_IP)
 #    soup = BeautifulSoup(driver.page_source, 'html.parser')
 #    print(soup.find('div', {'class': 'ip'}).text.strip())
 #    print(soup.find_all('div', {'class': 'ip-icon-label'}))
+
+class HeadHunter:
+    def __init__(self):
+        fake_user = fake_useragent.UserAgent().random
+        self.__FAKE_HEADER = {'user-agent': fake_user}
+        self.__HH_URL = 'https://hh.ru/search/vacancy?area=1&fromSearchLine=true&text=python'
+        self.__STR_PAGE = '&page='
+
+    def __get_max_page(self):
+        request = requests.get(self.__HH_URL, headers=self.__FAKE_HEADER)
+        if request.status_code != 200:
+            raise Exception('FAILED URL')
+
+        soup = BeautifulSoup(request.text, 'html.parser')
+        paginator = soup.find_all('span', {'class': 'pager-item-not-in-short-range'})
+        max_page = int(paginator[-1].text)
+
+        return max_page
+
+    def __create_vacancy(self, html):
+        title = html.find('div', {'class': 'vacancy-serp-item__info'}).find('a').text.strip()
+        company = html.find('div', {'class': 'vacancy-serp-item__meta-info-company'}).find('a').text.strip()
+        tmp_location = html.find('span', {'data-qa': 'vacancy-serp__vacancy-address'})
+        location = ''
+        if tmp_location is None:
+            location = 'Empty'
+        else:
+            location = html.find('span', {'data-qa': 'vacancy-serp__vacancy-address'}).text.strip().partition('и еще')[0]
+        link = html.find('div', {'class': 'vacancy-serp-item__info'}).find('a')['href']
+
+        vacancy = Vacancy(title=title, company=company, location=location, link=link)
+        return vacancy
+
+    def get_vacancies(self):
+        vacancies = []
+        # for page in range(self.__get_max_page()):
+        #     request = requests.get(f'{self.__HH_URL}{self.__STR_PAGE}{page}', headers=self.__FAKE_HEADER)
+        #     if request.status_code != 200:
+        #         continue
+        #
+        #     soup = BeautifulSoup(request.text, 'html.parser')
+        #     results = soup.find_all('div', {'class': 'vacancy-serp-item'})
+        #     for result in results:
+        #         vacancies.append(self.__create_vacancy(result))
+        request = requests.get(f'{self.__HH_URL}{self.__STR_PAGE}{0}', headers=self.__FAKE_HEADER)
+        soup = BeautifulSoup(request.text, 'html.parser')
+        stop = soup.find_all('div', {'class': 'serp-special serp-special_under-results'})
+        print(stop)
+        results = soup.find_all('div', {'class': 'vacancy-serp-item'})
+        for result in results:
+            vacancies.append(self.__create_vacancy(result))
+
+        return vacancies
 
 
