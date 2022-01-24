@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, send_file, url_for, abort, jsonify
+from flask import Blueprint, Response, render_template, request, redirect, send_file, url_for, abort, jsonify
 from flask_login.utils import login_required, login_user, logout_user, current_user
-from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm
-from .models import Job, User, Favorite
+from itsdangerous import json
+from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm, ParsingForm
+from .models import Job, User, Favorite, Role
 from .utils import parsing_vacancies, save_to_csv, get_percentage, update_persentage
 from app import db
 import threading
@@ -23,30 +24,49 @@ def home():
 @blueprint_app.route('/search', methods=['GET', 'POST'])
 @login_required
 def search():
-    form = SearchForm()
-    if form.validate_on_submit():
-        query = request.form.get('query_search')
+    form_search = SearchForm()
+    if form_search.validate_on_submit():
+        query_search = request.form.get('query_search')
         headhunter = request.form.get('headhunter')
         stackoverflow = request.form.get('stackoverflow')
         city = request.form.get('city')
         state = request.form.get('state')
         salary = request.form.get('salary')
-        parametrs = {'query': query,
-                     'headhunter': headhunter, 
-                     'stackoverflow': stackoverflow, 
-                     'city': city, 
-                     'state': state, 
-                     'salary': salary }
-        parsing = threading.Thread(target=parsing_vacancies, args=(parametrs,))
-        parsing.start()
-    return render_template('search_form.html', title='Job search', form=form)
+        # parametrs = {'query_search': query_search,
+        #              'headhunter': headhunter, 
+        #              'stackoverflow': stackoverflow, 
+        #              'city': city, 
+        #              'state': state, 
+        #              'salary': salary }
+        return redirect(url_for('blueprint_app.report', 
+                                query_search=query_search,
+                                headhunter=headhunter,
+                                stackoverflow=stackoverflow,
+                                city=city,
+                                state=state,
+                                salary=salary))
+    privilege = current_user.is_administrator()
+    if privilege:
+        form_parsing = ParsingForm()
+        if form_parsing.validate_on_submit():
+            query_parsing = request.form.get('query_parsing')
+            parsing = threading.Thread(target=parsing_vacancies, args=(query_parsing,))
+            parsing.start()
+    else:
+        form_parsing = None
+    return render_template('search_form.html', title='Job search', privilege = privilege, 
+                           form_search=form_search, form_parsing=form_parsing)
 
 
 @blueprint_app.route('/report', methods=['GET', 'POST'])
 @login_required
 def report():
-    # query = request.form.get('query_search')
-    query = None
+    query_search = request.args.get('query_search')
+    headhunter = request.args.get('headhunter')
+    stackoverflow = request.args.get('stackoverflow')
+    city = request.args.get('city')
+    state = request.args.get('state')
+    salary = request.args.get('salary')
     count = Job.query.count()
     if count > ROWS_PAGINATOR:
         page = request.args.get('page', 1, type=int)
@@ -68,13 +88,12 @@ def report():
             favorite_vacancies[job.id] = 'add'
         else:
             favorite_vacancies[job.id] = 'delete'
-    parametrs = {'query': query,
+    parametrs = {'query_search': query_search,
                  'id_jobs': id_jobs, 
                  'count': count, 
                  'paginate': paginate, 
                  'jobs': jobs, 
                  'favorite_vacancies': favorite_vacancies}
-    
     return render_template('report.html', parametrs=parametrs, title=title)
 
 
@@ -86,7 +105,7 @@ def favorites():
     for v in vacancies_favorites:
         id_list.append(v.id_vacancy)
     if len(id_list) == 0:
-        return redirect(url_for('blueprint_app.report'))
+        return redirect(request.url, code=302)
     jobs_filter = Job.query.filter(Job.id.in_(id_list))
     if len(id_list) > ROWS_PAGINATOR:
         page = request.args.get('page', 1, type=int)

@@ -8,40 +8,54 @@
 <div class="container col-4 border">
     <br>
     <!--<form class="align-items-center" method="POST" action={{ url_for('blueprint_app.report') }} novalidate>-->
-    <form id="form_search" class="align-items-center" method="POST">
-        {{ form.hidden_tag() }}
+    <form id="id_form_search" class="align-items-center" method="POST">
+        {{ form_search.hidden_tag() }}
         <div class="mb-3">
-            {{ form.query_search(class="form-control", placeholder="Request") }}
+            {{ form_search.query_search(class="form-control", placeholder="Request") }}
         </div>
 
         <div class="mb-3">
-            {{ form.city(class="form-control", placeholder="City") }}
+            {{ form_search.city(class="form-control", placeholder="City") }}
         </div>
 
         <div class="mb-3">
-            {{ form.state(class="form-control", placeholder="State") }}
+            {{ form_search.state(class="form-control", placeholder="State") }}
         </div>
 
         <div class="mb-3">
             <div class="input-group">
-                {{ form.salary(class="form-control", placeholder="Salary") }}
+                {{ form_search.salary(class="form-control", placeholder="Salary") }}
                 <span class="input-group-text">₽</span>
             </div>
         </div>
 
         <div class="form-check form-switch">
-            {{ form.headhunter(class="form-check-input", type="checkbox", checked="y") }}
+            {{ form_search.headhunter(class="form-check-input", type="checkbox", checked="y") }}
             <label class="form-check-label">HeadHunter</label>
         </div>
 
         <div class="form-check form-switch">
-            {{ form.stackoverflow(class="form-check-input", type="checkbox") }}
+            {{ form_search.stackoverflow(class="form-check-input", type="checkbox") }}
             <label class="form-check-label">StackOverflow</label>
         </div>
 
         <div align="right">
             <button type="reset" class="btn btn-outline-secondary">Clear</button>
-            {{ form.submit_search(id="search", class="btn btn-outline-secondary") }}
+            {{ form_search.submit_search(id="search", class="btn btn-outline-secondary") }}
+        </div>
+        <br>
+    </form>
+
+    {% if privilege %}
+    <form id="id_form_parsing" class="align-items-center" method="POST">
+        {{ form_parsing.hidden_tag() }}
+        <div class="mb-3">
+            {{ form_parsing.query_parsing(class="form-control", placeholder="Request") }}
+        </div>
+
+        <div align="right">
+            <button type="reset" class="btn btn-outline-secondary">Clear</button>
+            {{ form_parsing.submit_parsing(id="parsing", class="btn btn-outline-secondary") }}
         </div>
         <br>
     </form>
@@ -52,6 +66,7 @@
             <!--<span class="progress-bar-label">0%</span>-->
         </div>
     </div>
+    {% endif %}
     
     <!--<div class="progress" style="width: 50%; margin: 50px;">
 		<div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">

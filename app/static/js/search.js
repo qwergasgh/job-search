@@ -8,14 +8,14 @@ $.ajaxSetup({
     }
 })
 
-$('#form_search').on('submit', function(event){
+$('#form_parsing').on('submit', function(event){
     event.preventDefault();
     $.ajax({
         url: '/search',
         method: 'POST',
         data: $(this).serialize(),
         beforeSend:function() {
-            $('#search').attr('disabled', 'disabled');
+            $('#parsing').attr('disabled', 'disabled');
             $('#process').css('display', 'block');
             $('.progress-bar').css('width', '2%');
             $('.progress-bar-label').text('2%');

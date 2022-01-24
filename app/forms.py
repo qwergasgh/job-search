@@ -87,6 +87,17 @@ class SearchForm(FlaskForm):
             return False
         return True
 
+class ParsingForm(FlaskForm):
+    query_parsing = StringField('Query parsing', validators=[DataRequired(), Length(min=1, max=100)])
+    submit_parsing = SubmitField('Parsing')
+
+    def __init__(self, *args, **kwargs):
+        super(ParsingForm, self).__init__(*args, **kwargs)
+
+    def validate(self):
+        if self.query_parsing.data.strip() == "":
+            return False
+        return True
 
 class EditProfileForm(FlaskForm):
     user_name = StringField('Username',
