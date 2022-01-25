@@ -8,7 +8,8 @@ $.ajaxSetup({
     }
 })
 
-$('#form_parsing').on('submit', function(event){
+$('#id_form_parsing').on('submit', function(event) {
+    console.log('in function submit parsing')
     event.preventDefault();
     $.ajax({
         url: '/search',
@@ -39,13 +40,3 @@ $('#form_parsing').on('submit', function(event){
         }
     })
 });
-
-
-//var source = new EventSource("/progress");
-//	source.onmessage = function(event) {
-//		$('.progress-bar').css('width', event.data+'%').attr('aria-valuenow', event.data);
-//		$('.progress-bar-label').text(event.data+'%');
-//		if(event.data == 100){
-//			source.close()
-//		}
-//	}

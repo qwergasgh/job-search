@@ -4,13 +4,10 @@ from selenium.webdriver.firefox.service import Service
 from subprocess import Popen, PIPE
 from bs4 import BeautifulSoup
 import fake_useragent
-import os
+import threading
 import csv
 import time
-import requests
 
-
-PERCENTAGE = 0
 
 def save_to_csv(vacancies, file):
     try:
@@ -24,58 +21,88 @@ def save_to_csv(vacancies, file):
     except:
         return False
 
-def parsing_vacancies(parametrs):
-    global PERCENTAGE
-    while PERCENTAGE < 100:
-        # time.sleep(1)
-        PERCENTAGE += 1
-
-def update_persentage():
-    global PERCENTAGE
-    PERCENTAGE = 0
+def update_percentage(percentage):
+    Parsing.percentage = percentage
 
 def get_percentage():
-    return PERCENTAGE
+    return Parsing.percentage
 
+def parsing_vacancies(query_parsing, headhunter=False, stackoverflow=False):
+    p = Parsing(headhunter, stackoverflow, query_parsing)
+    # parsing = threading.Thread(target=p.start())
+    # parsing.start()
+    p.start()
 
-class ParsingQuery():
+class Parsing():
+    percentage = 0
+
+    def __init__(self, headhunter, stackoverflow, query_parsing):
+        self.headhunter = headhunter
+        self.stackoverflow = stackoverflow
+        self.query_parsing = query_parsing
+        self.vacancies = []
+
+    def start(self):
+        # ppp = ParsingProxyParametrs()
+        # parsing_proxy_parametrs = ppp.get_parametrs_for_parsing()
+        # if self.headhunter:
+        #     hh = HeadHunter(parsing_proxy_parametrs=parsing_proxy_parametrs,
+        #                     url='https://hh.ru/search/vacancy?area=1&fromSearchLine=true&text=',
+        #                     query_parsing=self.query_parsing, 
+        #                     str_page='&page=')
+        #     hh.parsing()
+        #     self.vacancies.append(hh.get_vacancies())
+        # if self.stackoverflow:
+        #     so = StackOverflow(parsing_proxy_parametrs=parsing_proxy_parametrs,
+        #                     url='https://stackoverflow.com/jobs?q=',
+        #                     query_parsing=self.query_parsing,
+        #                     str_page='&&pg=')
+        #     so.parsing()
+        #     self.vacancies.append(so.get_vacancies())
+
+        # for tests
+        print('start percentage =', get_percentage())
+        while get_percentage() < 100:
+            time.sleep(2)
+            count = get_percentage() + 1
+            update_percentage(count)
+
+        # ppp.close_tor()
+        # self.percentage = 100
+
+class ParsingProxyParametrs():
     def __init__(self):
-        self.percentage = 0
-        self.gecko_path = os.path.abspath(os.path.dirname(__file__)) + '/geckodriver'
+        #self.gecko_path = os.path.abspath(os.path.dirname(__file__)) + '/geckodriver'
+        self.gecko_path = '/usr/bin/geckodriver'
         self.binary_path = '/usr/bin/firefox'
         self.tor_path = '/usr/bin/tor'
-        self.tor = self.create_tor()
-        self.options = self.create_options()
+        self.tor = self._create_tor()
+        self.options = self._create_options()
         self.service = Service(executable_path=self.gecko_path)
 
-    def update_persentage(self):
-        self.percentage = 0
+    def _create_tor(self):
+        try:
+            print('tor start')
+            tor = Popen(self.tor_path, shell=True, stdout=PIPE, bufsize=-1)
+            if tor.poll() is not None:
+                raise Exception('No connection to tor :^(')
+            result_code = str(tor.stdout.readlines()[-1]).lower()
+            if 'failed' in result_code:
+                print('tor process is already running or port is in use')
+            if 'done' in result_code:
+                print('tor process created')
+            print('tor works')
+            return tor
+        except:
+            return None
 
-    def get_percentage(self):
-        return self.percentage
-
-    def create_tor(self):
-        print('tor start')
-        tor = Popen(self.tor_path, shell=True, stdout=PIPE, bufsize=-1)
-        if tor.poll() is not None:
-            raise Exception('No connection to tor :^(')
-        result_code = str(tor.stdout.readlines()[-1]).lower()
-        if 'failed' in result_code:
-            print('tor process is already running or port is in use')
-        if 'done' in result_code:
-            print('tor process created')
-        print('tor works')
-        return tor
-
-    def create_options(self):
+    def _create_options(self):
         options = Options()
         options.binary_location = self.binary_path
         options.set_preference('network.proxy.type', 1)
         options.set_preference('network.proxy.socks', '127.0.0.1')
         options.set_preference('network.proxy.socks_port', 9050)
         options.set_preference("network.proxy.socks_remote_dns", True)
-        fake_user = fake_useragent.UserAgent().random
-        options.set_preference('general.useragent.override', fake_user)
         return options
 
     def close_tor(self):
@@ -84,67 +111,111 @@ class ParsingQuery():
             print('tor closed\ntor exit code = ' + str(self.tor.poll()))
 
     def get_parametrs_for_parsing(self):
-        parametrs_for_parsing = {'options': self.options,
-                                 'service': self.service}
-        return parametrs_for_parsing
+        return {'options': self.options,
+                'service': self.service}
 
-# with Firefox(options=options, service=service) as driver:
-#    driver.get(url=URL_IP)
-#    soup = BeautifulSoup(driver.page_source, 'html.parser')
-#    print(soup.find('div', {'class': 'ip'}).text.strip())
-#    print(soup.find_all('div', {'class': 'ip-icon-label'}))
+class ParsingUtil():
+    def __init__(self, parsing_proxy_parametrs, query_parsing, url, str_page):
+        self.parametrs = parsing_proxy_parametrs
+        self.query = query_parsing
+        self.url = url
+        self.str_page = str_page
+        self.max_page = 0
+        self.vacancies = []
+        self._set_fake_useragent()
 
-# class HeadHunter:
-#     def __init__(self):
-#         fake_user = fake_useragent.UserAgent().random
-#         self.__FAKE_HEADER = {'user-agent': fake_user}
-#         self.__HH_URL = 'https://hh.ru/search/vacancy?area=1&fromSearchLine=true&text=python'
-#         self.__STR_PAGE = '&page='
+    # testing !!!
+    def _set_fake_useragent(self):
+        self.parametrs['options'].set_preference('general.useragent.override', 
+                                              self._get_fake_useragent())
 
-#     def __get_max_page(self):
-#         request = requests.get(self.__HH_URL, headers=self.__FAKE_HEADER)
-#         if request.status_code != 200:
-#             raise Exception('FAILED URL')
+    def _get_fake_useragent(self):
+        try:
+            return fake_useragent.UserAgent().random
+        except:
+            # add useragent !!!
+            return ''
 
-#         soup = BeautifulSoup(request.text, 'html.parser')
-#         paginator = soup.find_all('span', {'class': 'pager-item-not-in-short-range'})
-#         max_page = int(paginator[-1].text)
+    def _get_max_page(self, html):
+        pass
 
-#         return max_page
+    def _find_vacancies(self, html):
+        pass
 
-#     def __create_vacancy(self, html):
-#         title = html.find('div', {'class': 'vacancy-serp-item__info'}).find('a').text.strip()
-#         company = html.find('div', {'class': 'vacancy-serp-item__meta-info-company'}).find('a').text.strip()
-#         tmp_location = html.find('span', {'data-qa': 'vacancy-serp__vacancy-address'})
-#         location = ''
-#         if tmp_location is None:
-#             location = 'Empty'
-#         else:
-#             location = html.find('span', {'data-qa': 'vacancy-serp__vacancy-address'}).text.strip().partition('и еще')[0]
-#         link = html.find('div', {'class': 'vacancy-serp-item__info'}).find('a')['href']
+    def _create_vacancy(self, html):
+        pass
 
-#         vacancy = Vacancy(title=title, company=company, location=location, link=link)
-#         return vacancy
+    def parsing(self):
+        try:
+            with Firefox(options=self.parametrs['options'], service=self.parametrs['service']) as driver:
+                driver.get(url=f'{self.url}{self.query}')
+                self.max_page = self._get_max_page(driver.page_source)
+                for page in range(self.max_page):
+                    # number page testing !!!
+                    driver.get(url=f'{self.url}{self.query}{self.str_page}{page}')
+                    html = driver.page_source
+                    if  html is not None:
+                        self._find_vacancies(html)
+                        self._set_fake_useragent()
+                        # tesiting !!!
+                        update_percentage(int(page))
+        except:
+            update_percentage(100)
+            print('error parsing')
 
-#     def get_vacancies(self):
-#         vacancies = []
-#         # for page in range(self.__get_max_page()):
-#         #     request = requests.get(f'{self.__HH_URL}{self.__STR_PAGE}{page}', headers=self.__FAKE_HEADER)
-#         #     if request.status_code != 200:
-#         #         continue
-#         #
-#         #     soup = BeautifulSoup(request.text, 'html.parser')
-#         #     results = soup.find_all('div', {'class': 'vacancy-serp-item'})
-#         #     for result in results:
-#         #         vacancies.append(self.__create_vacancy(result))
-#         request = requests.get(f'{self.__HH_URL}{self.__STR_PAGE}{0}', headers=self.__FAKE_HEADER)
-#         soup = BeautifulSoup(request.text, 'html.parser')
-#         stop = soup.find_all('div', {'class': 'serp-special serp-special_under-results'})
-#         print(stop)
-#         results = soup.find_all('div', {'class': 'vacancy-serp-item'})
-#         for result in results:
-#             vacancies.append(self.__create_vacancy(result))
+    def get_vacancies(self):
+        return self.vacancies
 
-#         return vacancies
+    def percentage(self, number):
+        return number / self.max_page / 2
+
+class HeadHunter(ParsingUtil):
+    # testing not soup !!!
+    def _get_max_page(self, html):
+        soup = BeautifulSoup(html, 'html.parser')
+        paginator = soup.find_all('span', {'class': 'pager-item-not-in-short-range'})
+        max_page = int(paginator[-1].text)
+        return max_page
+
+    def _find_vacancies(self, html):
+        # testing not soup !!!
+        soup = BeautifulSoup(html, 'html.parser')
+        results = soup.find_all('div', {'class': 'vacancy-serp-item'})
+        for result in results:
+            self.vacancies.append(self._create_vacancy(result))
+
+    def _create_vacancy(self, html):
+        title = html.find('div', {'class': 'vacancy-serp-item__info'}).find('a').text.strip()
+        company = html.find('div', {'class': 'vacancy-serp-item__meta-info-company'}).find('a').text.strip()
+        location = html.find('span', {'data-qa': 'vacancy-serp__vacancy-address'})
+        if location is not None:
+            location = location.text.strip().partition('и еще')[0]
+        link = html.find('div', {'class': 'vacancy-serp-item__info'}).find('a')['href'].strip()
+        vacancy = {'title': title, 'company': company, 'location': location, 'link': link}
+        return vacancy
 
 
+
+class StackOverflow(ParsingUtil):
+    def _get_max_page(self, html):
+        # testing not soup !!!
+        soup = BeautifulSoup(html, 'html.parser')
+        paginator = soup.find('div', {'class': 's-pagination'}).find_all('a')
+        max_page = int(paginator[-2].find('span').text)
+        return max_page
+
+    def _find_vacancies(self, html):
+        # testing not soup !!!
+        soup = BeautifulSoup(html, 'html.parser')
+        results = soup.find_all('div', {'class': '-job'})
+        for result in results:
+            self.vacancies.append(self._create_vacancy(result))
+
+    def _create_vacancy(self, html):
+        title = html.find('h2').find('a').text.strip()
+        company = html.find('h3').find_all('span')[0].text.strip() 
+        location = html.find('h3').find_all('span')[1].text.strip()
+        vacancy_id = html['data-jobid']
+        link = f'https://stackoverflow.com/jobs/{vacancy_id}/'
+        vacancy = {'title': title, 'company': company, 'location': location, 'link': link}
+        return vacancy

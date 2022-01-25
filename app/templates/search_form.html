@@ -53,6 +53,16 @@
             {{ form_parsing.query_parsing(class="form-control", placeholder="Request") }}
         </div>
 
+        <div class="form-check form-switch">
+            {{ form_parsing.headhunter(class="form-check-input", type="checkbox", checked="y") }}
+            <label class="form-check-label">HeadHunter</label>
+        </div>
+
+        <div class="form-check form-switch">
+            {{ form_parsing.stackoverflow(class="form-check-input", type="checkbox") }}
+            <label class="form-check-label">StackOverflow</label>
+        </div>
+
         <div align="right">
             <button type="reset" class="btn btn-outline-secondary">Clear</button>
             {{ form_parsing.submit_parsing(id="parsing", class="btn btn-outline-secondary") }}

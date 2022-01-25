@@ -33,10 +33,11 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    user_name = StringField('Username', validators=[DataRequired(), Length(min=3, max=64),
-                                                    Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
-                                                           "Usernames must have only letters, numbers, dots or "
-                                                           "underscores")])
+    user_name = StringField('Username', 
+                            validators=[DataRequired(), 
+                            Length(min=3, max=64),
+                            Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
+                                   'Usernames must have only letters, numbers, dots or underscores')])
     email = EmailField('Email',
                        validators=[DataRequired(), Email(), Length(min=3, max=64)])
     password = PasswordField('Password',
@@ -46,8 +47,10 @@ class RegisterForm(FlaskForm):
                                                                 message='Passwords must match')])
     first_name = StringField('First name', validators=[DataRequired(), Length(min=3, max=64)])
     last_name = StringField('Last name', validators=[DataRequired(), Length(min=3, max=64)])
-    phonenumber = StringField('Phonenumber', validators=[DataRequired(), Length(min=10, max=12),
-                                                         Regexp('[0-9]', 0, "Phonenumber must have only numbers")])
+    phonenumber = StringField('Phonenumber', 
+                              validators=[DataRequired(), 
+                              Length(min=10, max=12),
+                              Regexp('[0-9]', 0, "Phonenumber must have only numbers")])
     submit = SubmitField('Register')
 
     def __init__(self, *args, **kwargs):
@@ -90,6 +93,8 @@ class SearchForm(FlaskForm):
 class ParsingForm(FlaskForm):
     query_parsing = StringField('Query parsing', validators=[DataRequired(), Length(min=1, max=100)])
     submit_parsing = SubmitField('Parsing')
+    headhunter = BooleanField('HeadHunter')
+    stackoverflow = BooleanField('StackOverFlow')
 
     def __init__(self, *args, **kwargs):
         super(ParsingForm, self).__init__(*args, **kwargs)
@@ -101,16 +106,18 @@ class ParsingForm(FlaskForm):
 
 class EditProfileForm(FlaskForm):
     user_name = StringField('Username',
-                            validators=[DataRequired(), Length(min=3, max=64), Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
-                                                                                      "Usernames must have only "
-                                                                                      "letters, numbers, "
-                                                                                      "dots or underscores")])
+                            validators=[DataRequired(),
+                            Length(min=3, max=64), 
+                            Regexp('^[A-Za-z][A-Za-z0-9_.]*$', 0,
+                                   'Usernames must have only letters, numbers, dots or underscores')])
     email = EmailField('Email',
                        validators=[DataRequired(), Email(), Length(min=3, max=64)])
     first_name = StringField('First name', validators=[DataRequired(), Length(min=3, max=64)])
     last_name = StringField('Last name', validators=[DataRequired(), Length(min=3, max=64)])
-    phonenumber = StringField('Phonenumber', validators=[DataRequired(), Length(min=10, max=12),
-                                                         Regexp('[0-9]', 0, "Phonenumber must have only numbers")])
+    phonenumber = StringField('Phonenumber', 
+                              validators=[DataRequired(), 
+                              Length(min=10, max=12),
+                              Regexp('[0-9]', 0, 'Phonenumber must have only numbers')])
     # password = PasswordField('Password',
     #         validators=[DataRequired(), Length(min=8, max=64)])
     # confirm = PasswordField('Verify password',

@@ -1,11 +1,9 @@
-from flask import Blueprint, Response, render_template, request, redirect, send_file, url_for, abort, jsonify
+from flask import Blueprint, render_template, request, redirect, send_file, url_for, abort, jsonify
 from flask_login.utils import login_required, login_user, logout_user, current_user
-from itsdangerous import json
 from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm, ParsingForm
-from .models import Job, User, Favorite, Role
-from .utils import parsing_vacancies, save_to_csv, get_percentage, update_persentage
+from .models import Job, User, Favorite
+from .utils import save_to_csv, update_percentage, get_percentage, parsing_vacancies
 from app import db
-import threading
 import os
 
 
@@ -20,40 +18,36 @@ ROWS_PAGINATOR = 20
 def home(): 
     return render_template('index.html', title='Job search')
 
-
+# method get or post add if else 
 @blueprint_app.route('/search', methods=['GET', 'POST'])
 @login_required
 def search():
     form_search = SearchForm()
-    if form_search.validate_on_submit():
-        query_search = request.form.get('query_search')
-        headhunter = request.form.get('headhunter')
-        stackoverflow = request.form.get('stackoverflow')
-        city = request.form.get('city')
-        state = request.form.get('state')
-        salary = request.form.get('salary')
-        # parametrs = {'query_search': query_search,
-        #              'headhunter': headhunter, 
-        #              'stackoverflow': stackoverflow, 
-        #              'city': city, 
-        #              'state': state, 
-        #              'salary': salary }
-        return redirect(url_for('blueprint_app.report', 
-                                query_search=query_search,
-                                headhunter=headhunter,
-                                stackoverflow=stackoverflow,
-                                city=city,
-                                state=state,
-                                salary=salary))
+    if request.method == 'POST':
+        if request.form.get('submit_search') is not None:
+            if form_search.validate_on_submit():
+                query_search = request.form.get('query_search')
+                headhunter = request.form.get('headhunter')
+                stackoverflow = request.form.get('stackoverflow')
+                city = request.form.get('city')
+                state = request.form.get('state')
+                salary = request.form.get('salary')
+                return redirect(url_for('blueprint_app.report', 
+                                        query_search=query_search,
+                                        headhunter=headhunter,
+                                        stackoverflow=stackoverflow,
+                                        city=city,
+                                        state=state,
+                                        salary=salary))
     privilege = current_user.is_administrator()
     if privilege:
         form_parsing = ParsingForm()
-        if form_parsing.validate_on_submit():
-            query_parsing = request.form.get('query_parsing')
-            parsing = threading.Thread(target=parsing_vacancies, args=(query_parsing,))
-            parsing.start()
-    else:
-        form_parsing = None
+        if request.method == 'POST':
+            if request.form.get('submit_parsing')  is not None:
+                if form_parsing.validate_on_submit():
+                    query_parsing = request.form.get('query_parsing')
+                    # add parametr hh and so
+                    parsing_vacancies(query_parsing)
     return render_template('search_form.html', title='Job search', privilege = privilege, 
                            form_search=form_search, form_parsing=form_parsing)
 
@@ -184,7 +178,9 @@ def edit_profile():
     form.last_name.data = current_user.last_name
     form.phonenumber.data = current_user.phonenumber
     # form.password.data = current_user.password
-    return render_template('edit_profile.html', title="Edit profile", form=form, name=name)
+    return render_template('edit_profile.html', 
+                           title="Edit profile", 
+                           form=form, name=name)
 
 
 @blueprint_app.route('/export')
@@ -229,7 +225,8 @@ def set_status_vacancy():
                 favorite_vacancy = Favorite(id_user=id_user, id_vacancy=id_vacancy)
                 db.session.add(favorite_vacancy)
             if param == 'delete':
-                favorite_vacancy = Favorite.query.filter_by(id_user=id_user, id_vacancy=id_vacancy).first()
+                favorite_vacancy = Favorite.query.filter_by(id_user=id_user, 
+                                                            id_vacancy=id_vacancy).first()
                 db.session.delete(favorite_vacancy)
             db.session.commit()
             return jsonify({'valid': 'True'}), 200
@@ -239,10 +236,11 @@ def set_status_vacancy():
 
 @blueprint_app.route('/search/parsing')
 def progress():
-    percentge = get_percentage()
-    if percentge == 100:
-        update_persentage()
-    return jsonify({'percentage': percentge}), 200
+    percentage = get_percentage()
+    print('get percentage =', percentage)
+    if percentage == 100:
+        update_percentage(0)
+    return jsonify({'percentage': percentage}), 200
 
 
 @blueprint_app.errorhandler(404)
