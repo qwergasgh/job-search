@@ -42,71 +42,79 @@ $('#id_form_parsing').on('submit', function(event) {
 });
 
 
-$(window).on('beforeunload', function() {
-    $.ajax({
-        url: '/search/stop-parsing',
-        method: 'POST'
-    });
-});
-
-$(window).on('unload', function() {
-    $.ajax({
-        url: '/search/stop-parsing',
-        method: 'POST'
-    });
-});
-
-$(window).on('onunload', function() {
-    $.ajax({
-        url: '/search/stop-parsing',
-        method: 'POST'
-    });
-});
-
-$(window).addEventListener('beforeunload', function(event) {
+$(window).on('beforeunload', function(event) {
     event.preventDefault();
     $.ajax({
         url: '/search/stop-parsing',
         method: 'POST'
     });
-    event.returnValue = '';
 });
 
- $(window).addEventListener('unload', function(event) {
-    event.preventDefault();
-    $.ajax({
-        url: '/search/stop-parsing',
-        method: 'POST'
-    });
-    event.returnValue = '';
- });
+// $(window).on('beforeunload', function() {
+//     $.ajax({
+//         url: '/search/stop-parsing',
+//         method: 'POST'
+//     });
+// });
 
- $(window).addEventListener('onunload', function(event) {
-    event.preventDefault();
-    $.ajax({
-        url: '/search/stop-parsing',
-        method: 'POST'
-    });
-    event.returnValue = '';
- });
+// $(window).on('unload', function() {
+//     $.ajax({
+//         url: '/search/stop-parsing',
+//         method: 'POST'
+//     });
+// });
 
- $(window).beforeunload(function() {
-    $.ajax({
-        url: '/search/stop-parsing',
-        method: 'POST'
-    });
-});
+// $(window).on('onunload', function() {
+//     $.ajax({
+//         url: '/search/stop-parsing',
+//         method: 'POST'
+//     });
+// });
 
- $(window).unload(function() {
-    $.ajax({
-        url: '/search/stop-parsing',
-        method: 'POST'
-    });
-});
+// $(window).addEventListener('beforeunload', function(event) {
+//     event.preventDefault();
+//     $.ajax({
+//         url: '/search/stop-parsing',
+//         method: 'POST'
+//     });
+//     event.returnValue = '';
+// });
 
-$(window).onunload(function() {
-    $.ajax({
-        url: '/search/stop-parsing',
-        method: 'POST'
-    });
-});
+//  $(window).addEventListener('unload', function(event) {
+//     event.preventDefault();
+//     $.ajax({
+//         url: '/search/stop-parsing',
+//         method: 'POST'
+//     });
+//     event.returnValue = '';
+//  });
+
+//  $(window).addEventListener('onunload', function(event) {
+//     event.preventDefault();
+//     $.ajax({
+//         url: '/search/stop-parsing',
+//         method: 'POST'
+//     });
+//     event.returnValue = '';
+//  });
+
+//  $(window).beforeunload(function() {
+//     $.ajax({
+//         url: '/search/stop-parsing',
+//         method: 'POST'
+//     });
+// });
+
+//  $(window).unload(function() {
+//     $.ajax({
+//         url: '/search/stop-parsing',
+//         method: 'POST'
+//     });
+// });
+
+// $(window).onunload(function() {
+//     $.ajax({
+//         url: '/search/stop-parsing',
+//         method: 'POST'
+//     });
+// });
