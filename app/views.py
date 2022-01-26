@@ -2,14 +2,15 @@ from flask import Blueprint, render_template, request, redirect, send_file, url_
 from flask_login.utils import login_required, login_user, logout_user, current_user
 from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm, ParsingForm
 from .models import Job, User, Favorite
-from .utils import save_to_csv, update_percentage, get_percentage, parsing_vacancies
+from .utils import save_to_csv, Parsing# update_percentage, get_percentage, parsing_vacancies
 from app import db
 import os
 
 
 
 blueprint_app = Blueprint('blueprint_app', __name__,
-                          template_folder='templates', static_folder='static')
+                          template_folder='templates', 
+                          static_folder='static')
 ROWS_PAGINATOR = 20
 
 
@@ -43,11 +44,23 @@ def search():
     if privilege:
         form_parsing = ParsingForm()
         if request.method == 'POST':
-            if request.form.get('submit_parsing')  is not None:
+            query_parsing = request.form.get('query_parsing')
+            if query_parsing is not None:
                 if form_parsing.validate_on_submit():
-                    query_parsing = request.form.get('query_parsing')
+                    hh = request.form.get('headhunter')
+                    if hh == 'y':
+                        headhunter = True
+                    else:
+                        headhunter = False
+                    so = request.form.get('stackoverflow')
+                    if so == 'y':
+                        stackoverflow = True
+                    else:
+                        stackoverflow = False
                     # add parametr hh and so
-                    parsing_vacancies(query_parsing)
+                    # parsing_vacancies(query_parsing, headhunter, stackoverflow)
+                    p = Parsing(headhunter, stackoverflow, query_parsing)
+                    p.parsing_vacancies()
     return render_template('search_form.html', title='Job search', privilege = privilege, 
                            form_search=form_search, form_parsing=form_parsing)
 
@@ -236,11 +249,17 @@ def set_status_vacancy():
 
 @blueprint_app.route('/search/parsing')
 def progress():
-    percentage = get_percentage()
-    print('get percentage =', percentage)
+    percentage = Parsing.get_percentage()
     if percentage == 100:
-        update_percentage(0)
+        Parsing.update_percentage(0)
     return jsonify({'percentage': percentage}), 200
+
+@blueprint_app.route('/search/stop-parsing', methods=['POST'])
+def stop_parsing():
+    Parsing.set_status_thread(False)
+    Parsing.update_percentage(0)
+    print('stop')
+    return jsonify({'parsing': 'stop'}), 200
 
 
 @blueprint_app.errorhandler(404)

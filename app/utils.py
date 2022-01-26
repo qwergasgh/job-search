@@ -1,13 +1,15 @@
+from flask.json.tag import PassDict
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 from subprocess import Popen, PIPE
 from bs4 import BeautifulSoup
 import fake_useragent
-import threading
+from threading import Thread, Lock
 import csv
 import time
 
+lock = Lock()
 
 def save_to_csv(vacancies, file):
     try:
@@ -21,28 +23,56 @@ def save_to_csv(vacancies, file):
     except:
         return False
 
-def update_percentage(percentage):
-    Parsing.percentage = percentage
+# def update_percentage(percentage):
+#     Parsing.percentage = percentage
 
-def get_percentage():
-    return Parsing.percentage
+# def get_percentage():
+#     return Parsing.percentage
 
-def parsing_vacancies(query_parsing, headhunter=False, stackoverflow=False):
-    p = Parsing(headhunter, stackoverflow, query_parsing)
-    # parsing = threading.Thread(target=p.start())
-    # parsing.start()
-    p.start()
+# def parsing_vacancies(query_parsing, headhunter=False, stackoverflow=False):
+#     p = Parsing(headhunter, stackoverflow, query_parsing)
+#     parsing = Thread(target=p.start())
+#     parsing.start()
 
 class Parsing():
     percentage = 0
+    status_thread = False
 
     def __init__(self, headhunter, stackoverflow, query_parsing):
         self.headhunter = headhunter
         self.stackoverflow = stackoverflow
         self.query_parsing = query_parsing
+        self.thread = None
+        self.lock = None
         self.vacancies = []
+        self._create_threading()
 
-    def start(self):
+    @staticmethod
+    def update_percentage(percentage):
+        Parsing.percentage = percentage
+
+    @staticmethod
+    def get_percentage():
+        return Parsing.percentage
+
+    @staticmethod
+    def get_status_thread():
+        return Parsing.status_thread
+
+    @staticmethod
+    def set_status_thread(status=False):
+        # lock.acquire()
+        Parsing.status_thread = status
+        # lock.release()
+
+    def _create_threading(self):
+        self.thread = Thread(target=self._start)
+
+    def parsing_vacancies(self):
+        Parsing.set_status_thread(True)
+        self.thread.start()
+
+    def _start(self):
         # ppp = ParsingProxyParametrs()
         # parsing_proxy_parametrs = ppp.get_parametrs_for_parsing()
         # if self.headhunter:
@@ -61,14 +91,20 @@ class Parsing():
         #     self.vacancies.append(so.get_vacancies())
 
         # for tests
-        print('start percentage =', get_percentage())
-        while get_percentage() < 100:
+        while Parsing.get_percentage() < 100:
+            if not Parsing.get_status_thread():
+                return
             time.sleep(2)
-            count = get_percentage() + 1
-            update_percentage(count)
+            count = Parsing.get_percentage() + 1
+            lock.acquire()
+            Parsing.update_percentage(count)
+            print(count)
+            lock.release()
 
         # ppp.close_tor()
-        # self.percentage = 100
+        lock.acquire()
+        self.percentage = 100
+        lock.release()
 
 class ParsingProxyParametrs():
     def __init__(self):
@@ -127,7 +163,7 @@ class ParsingUtil():
     # testing !!!
     def _set_fake_useragent(self):
         self.parametrs['options'].set_preference('general.useragent.override', 
-                                              self._get_fake_useragent())
+                                                 self._get_fake_useragent())
 
     def _get_fake_useragent(self):
         try:
@@ -151,6 +187,10 @@ class ParsingUtil():
                 driver.get(url=f'{self.url}{self.query}')
                 self.max_page = self._get_max_page(driver.page_source)
                 for page in range(self.max_page):
+
+                    if not Parsing.get_status_thread:
+                        return
+
                     # number page testing !!!
                     driver.get(url=f'{self.url}{self.query}{self.str_page}{page}')
                     html = driver.page_source
@@ -158,10 +198,14 @@ class ParsingUtil():
                         self._find_vacancies(html)
                         self._set_fake_useragent()
                         # tesiting !!!
-                        update_percentage(int(page))
+                        lock.acquire()
+                        Parsing.update_percentage(int(page))
+                        lock.release()
         except:
-            update_percentage(100)
+            lock.acquire()
+            Parsing.update_percentage(100)
             print('error parsing')
+            lock.release()
 
     def get_vacancies(self):
         return self.vacancies
