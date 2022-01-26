@@ -104,6 +104,12 @@ def report():
     return render_template('report.html', parametrs=parametrs, title=title)
 
 
+@blueprint_app.route('/parsing-results', methods=['GET', 'POST'])
+@login_required
+def parsing_results():
+    pass
+
+
 @blueprint_app.route('/favorites', methods=['GET', 'POST'])
 @login_required
 def favorites():
