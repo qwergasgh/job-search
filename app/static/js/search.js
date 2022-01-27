@@ -30,7 +30,7 @@ $('#id_form_parsing').on('submit', function(event) {
                     $('.progress-bar-label').text(data.percentage + '%');
                     if (data.percentage == 100) {
                         clearInterval(timer);
-                        document.location.href = '/report';
+                        document.location.href = '/search/parsing-result';
                     }
                 });
             }, 5000);

@@ -1,4 +1,3 @@
-from flask.json.tag import PassDict
 from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
@@ -8,6 +7,8 @@ import fake_useragent
 from threading import Thread, Lock
 import csv
 import time
+from .models import TempJob
+from app import db
 
 lock = Lock()
 
@@ -23,16 +24,6 @@ def save_to_csv(vacancies, file):
     except:
         return False
 
-# def update_percentage(percentage):
-#     Parsing.percentage = percentage
-
-# def get_percentage():
-#     return Parsing.percentage
-
-# def parsing_vacancies(query_parsing, headhunter=False, stackoverflow=False):
-#     p = Parsing(headhunter, stackoverflow, query_parsing)
-#     parsing = Thread(target=p.start())
-#     parsing.start()
 
 class Parsing():
     percentage = 0
@@ -43,7 +34,6 @@ class Parsing():
         self.stackoverflow = stackoverflow
         self.query_parsing = query_parsing
         self.thread = None
-        self.lock = None
         self.vacancies = []
         self._create_threading()
 
@@ -61,9 +51,7 @@ class Parsing():
 
     @staticmethod
     def set_status_thread(status=False):
-        # lock.acquire()
         Parsing.status_thread = status
-        # lock.release()
 
     def _create_threading(self):
         self.thread = Thread(target=self._start)
@@ -71,6 +59,21 @@ class Parsing():
     def parsing_vacancies(self):
         Parsing.set_status_thread(True)
         self.thread.start()
+
+    def filling_database(self):
+        try:
+            for vacancy in self.vacancies:
+                temp_job = TempJob(title=vacancy.title, 
+                                   company=vacancy.company, 
+                                   salary=vacancy.salary, 
+                                   location=vacancy.location, 
+                                   link=vacancy.link,
+                                   source=vacancy.source)
+                db.session.add(temp_job)
+                db.session.commit()
+            return True
+        except:
+            return False
 
     def _start(self):
         # ppp = ParsingProxyParametrs()
@@ -81,14 +84,24 @@ class Parsing():
         #                     query_parsing=self.query_parsing, 
         #                     str_page='&page=')
         #     hh.parsing()
+        #     lock.acquire()
         #     self.vacancies.append(hh.get_vacancies())
+        #     lock.release()
         # if self.stackoverflow:
         #     so = StackOverflow(parsing_proxy_parametrs=parsing_proxy_parametrs,
         #                     url='https://stackoverflow.com/jobs?q=',
         #                     query_parsing=self.query_parsing,
         #                     str_page='&&pg=')
         #     so.parsing()
+        #     lock.acquire()
         #     self.vacancies.append(so.get_vacancies())
+        #     lock.release()
+        # if not Parsing.get_status_thread():
+        #         return
+        # lock.acquire()
+        # if len(self.vacancies) > 0:
+        #     self.filling_database()
+        # lock.release()
 
         # for tests
         while Parsing.get_percentage() < 100:
@@ -181,6 +194,14 @@ class ParsingUtil():
     def _create_vacancy(self, html):
         pass
 
+    def _generate_dict_vacancy(self, title, company, location, link, salary, source):
+        return {'title': title, 
+                'company': company, 
+                'location': location, 
+                'link': link,
+                'salary': salary,
+                'source': source}
+
     def parsing(self):
         try:
             with Firefox(options=self.parametrs['options'], service=self.parametrs['service']) as driver:
@@ -235,8 +256,9 @@ class HeadHunter(ParsingUtil):
         if location is not None:
             location = location.text.strip().partition('и еще')[0]
         link = html.find('div', {'class': 'vacancy-serp-item__info'}).find('a')['href'].strip()
-        vacancy = {'title': title, 'company': company, 'location': location, 'link': link}
-        return vacancy
+        salary = 666
+        source = 'hh'
+        return self._generate_dict_vacancy(title, company, location, link, salary, source)
 
 
 
@@ -261,5 +283,7 @@ class StackOverflow(ParsingUtil):
         location = html.find('h3').find_all('span')[1].text.strip()
         vacancy_id = html['data-jobid']
         link = f'https://stackoverflow.com/jobs/{vacancy_id}/'
-        vacancy = {'title': title, 'company': company, 'location': location, 'link': link}
-        return vacancy
+        salary = 666
+        source = 'so'
+        return self._generate_dict_vacancy(title, company, location, link, salary, source)
+

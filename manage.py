@@ -1,5 +1,5 @@
 from flask_migrate import Migrate, MigrateCommand
-from app.models import Job, Favorite, User
+from app.models import Job, Favorite, User, Role, TempJob
 from flask_script import Manager, Shell
 from app import app, db
 
@@ -9,7 +9,13 @@ migrate = Migrate(app, db)
 
 
 def make_shell_context():
-    return dict(app=app, db=db, Job=Job, User=User, Favorite=Favorite)
+    return dict(app=app,
+                db=db, 
+                Job=Job, 
+                User=User, 
+                Favorite=Favorite, 
+                Role=Role, 
+                TempJob=TempJob)
 
 
 manager.add_command('shell', Shell(make_context=make_shell_context))

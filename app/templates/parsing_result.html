@@ -1,9 +1,98 @@
 {% extends 'base.html' %}
 
+{% if parametrs.jobs is not none %}
+{% block page_content %}
+<meta name="csrf-token" content="{{ csrf_token() }}">
+    <div class="container col-12" style="margin-top:15px;">
+        <table class="table table-striped table-hover border">
+            <thead>
+            <tr>
+                <td align="center" colspan="6"> 
+                <b>Searching for &laquo;{{ parametrs.query_search }}&raquo; found {{ parametrs.count }}
+                    {% if parametrs.count == 1 %}
+                        job
+                    {% else %}
+                        jobs.
+                    {% endif %}
+                    {% if parametrs.paginate %}
+                        Showing page {{ parametrs.jobs.page }} of {{ parametrs.temp_jobs.pages }}.
+                    {% endif %}
+                </b></td>
+                <td align="center" colspan="6">
+                    <b>Set database<b>
+                    <select class="form-select form-select-lg-sm">
+                        <option selected>All</option>
+                        <option value='1'>Favorites</option>
+                    </select>
+                    <!--<div class="custom-control custom-switch col-3">
+                        <input id="all" type="checkbox" 
+                            class="custom-control-input"
+                            checked="n">
+                        <label class="custom-control-label", for="all">All</label>
+                    </div>
+                    <div class="custom-control custom-switch col-3">
+                        <input id="favorites" type="checkbox" 
+                            class="custom-control-input"
+                            checked="n">
+                        <label class="custom-control-label", for="favorites">Favorites</label>
+                    </div>-->
+                    <input type="button" 
+                           class="btn btn-outline-secondary"
+                           value="Apply modification" 
+                           onclick="set_database_favorites()">
+                </td>
+            </tr>
+            <tr>
+                <!--<th>Number</th>-->
+                <th>Title</th>
+                <th>Company</th>
+                <th>Salary</th>
+                <th>Location</th>
+                <th>Favorites</th>
+                <th>Link</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% if parametrs.paginate %}
+            {% for job in parametrs.jobs.items %}
+            <tr>
+                <!--<td>{{ job.id }}</td>-->
+                <td>{{ job.title }}</td>
+                <td>{{ job.company }}</td>
+                <td>{{ job.salary }}</td>
+                <td>{{ job.location }}</td>
+                <td><input id="{{job.id}}" type="checkbox" 
+                           class="form-check-input"
+                           checked={% if job.status %}"y"{% else %}"n"{% endif %}
+                           onclick="status_temp_vacancy({{job.id}})"></td>
+                <td><a href="{{ job.link }}" target="_blank">Open</a></td>
+            </tr>
+            {% endfor %}
+            {% else %}
+            {% for job in parametrs.jobs %}
+            <tr>
+                <!--<td>{{ job.id }}</td>-->
+                <td>{{ job.title }}</td>
+                <td>{{ job.company }}</td>
+                <td>{{ job.salary }}</td>
+                <td>{{ job.location }}</td>
+                <td><input id="{{job.id}}" type="checkbox" 
+                    class="form-check-input"
+                    checked={% if job.status %}"y"{% else %}"n"{% endif %}
+                    onclick="status_temp_vacancy({{job.id}})"></td>
+                <td><a href="{{ job.link }}" target="_blank">Open</a></td>
+            </tr>
+            {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+        {% if parametrs.paginate %}{% include 'paginator.html' %}{% endif %}
+    </div><br>
 
-
-
+{% endblock %}
 
 {% block script %}
 <script src="/static/js/parsing_result.js"></script>
 {% endblock %}
+
+{% endif %}

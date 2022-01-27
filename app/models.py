@@ -12,6 +12,23 @@ class Job(db.Model):
     location = db.Column(db.String(80), nullable=False)
     salary = db.Column(db.Integer, nullable=False)
     link = db.Column(db.String(80), nullable=False)
+    source = db.Column(db.String(80), nullable=False)
+
+class TempJob(db.Model):
+    __tablename__ = 'temp_vacancies'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(80), nullable=False)
+    company = db.Column(db.String(80), nullable=False)
+    location = db.Column(db.String(80), nullable=False)
+    salary = db.Column(db.Integer, nullable=False)
+    link = db.Column(db.String(80), nullable=False)
+    source = db.Column(db.String(80), nullable=False)
+    status = db.Column(db.Boolean, index=True)
+
+    def __init__(self, **kwargs):
+        super(TempJob, self).__init__(**kwargs)
+        if self.status is None:
+            self.status = False
 
 
 class User(db.Model, UserMixin):
