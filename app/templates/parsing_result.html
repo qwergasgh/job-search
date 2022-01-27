@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% if parametrs.jobs is not none %}
+
 {% block page_content %}
 <meta name="csrf-token" content="{{ csrf_token() }}">
     <div class="container col-12" style="margin-top:15px;">
@@ -17,7 +17,8 @@
                     {% if parametrs.paginate %}
                         Showing page {{ parametrs.jobs.page }} of {{ parametrs.temp_jobs.pages }}.
                     {% endif %}
-                </b></td>
+                </b></td></tr>
+                <tr>
                 <td align="center" colspan="6">
                     <b>Set database<b>
                     <select class="form-select form-select-lg-sm">
@@ -61,10 +62,13 @@
                 <td>{{ job.company }}</td>
                 <td>{{ job.salary }}</td>
                 <td>{{ job.location }}</td>
-                <td><input id="{{job.id}}" type="checkbox" 
-                           class="form-check-input"
-                           checked={% if job.status %}"y"{% else %}"n"{% endif %}
-                           onclick="status_temp_vacancy({{job.id}})"></td>
+                <td>
+                    <input id="{{job.id}}" 
+                           class="custom-control-input"
+                           type="checkbox" 
+                           onclick="status_temp_vacancy({{job.id}})"
+                           checked={% if job.status %}'y'{%else%}'n'{% endif %}>
+                </td>
                 <td><a href="{{ job.link }}" target="_blank">Open</a></td>
             </tr>
             {% endfor %}
@@ -94,5 +98,5 @@
 {% block script %}
 <script src="/static/js/parsing_result.js"></script>
 {% endblock %}
-
+{% if parametrs.jobs is not none %}
 {% endif %}

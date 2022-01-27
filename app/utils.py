@@ -107,7 +107,7 @@ class Parsing():
         while Parsing.get_percentage() < 100:
             if not Parsing.get_status_thread():
                 return
-            time.sleep(2)
+            # time.sleep(2)
             count = Parsing.get_percentage() + 1
             lock.acquire()
             Parsing.update_percentage(count)
