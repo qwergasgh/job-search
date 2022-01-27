@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, send_file, url_for, abort, jsonify
 from flask_login.utils import login_required, login_user, logout_user, current_user
 from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm, ParsingForm
-from .models import Job, User, Favorite
+from .models import Job, User, Favorite, TempJob
 from .utils import save_to_csv, Parsing# update_percentage, get_percentage, parsing_vacancies
 from app import db
 import os
@@ -84,19 +84,19 @@ def report():
         jobs = Job.query.all()
         title = 'Searching results'
         paginate = False
-    id_jobs = []
+    # id_jobs = []
     favorite_vacancies = {}
     for job in jobs.items:
         id = job.id
-        id_jobs.append(id)
+        # id_jobs.append(id)
         favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id, 
                                                     id_vacancy=id).first()
         if favorite_vacancy is None:
-            favorite_vacancies[job.id] = 'add'
+            favorite_vacancies[id] = 'add'
         else:
-            favorite_vacancies[job.id] = 'delete'
+            favorite_vacancies[id] = 'delete'
     parametrs = {'query_search': query_search,
-                 'id_jobs': id_jobs, 
+                 # 'id_jobs': id_jobs, 
                  'count': count, 
                  'paginate': paginate, 
                  'jobs': jobs, 
@@ -136,10 +136,8 @@ def favorites():
 @blueprint_app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
-    print(form.password.data)
     if form.validate_on_submit():
         user = User.query.filter_by(email=request.form.get('email')).first()
-        print(form.password.data)
         if user is not None and user.verify_password(form.password.data):
             login_user(user)
             return redirect(url_for('blueprint_app.home'))
@@ -266,6 +264,76 @@ def stop_parsing():
     Parsing.update_percentage(0)
     print('stop')
     return jsonify({'parsing': 'stop'}), 200
+
+
+@blueprint_app.route('/search/parsing-result')
+@login_required
+def parsing_result():
+    count = TempJob.query.count()
+    if count > ROWS_PAGINATOR:
+        page = request.args.get('page', 1, type=int)
+        temp_jobs = TempJob.query.paginate(page=page, per_page=ROWS_PAGINATOR)
+        title = f'Parsing results {page} page'
+        paginate = True
+    else:
+        temp_jobs = TempJob.query.all()
+        title = 'Parsing results'
+        paginate = False
+    # checked_list = {}
+    # for job in temp_jobs.items:
+    #     id = job.id
+    #     temp_job = TempJob.query.filter_by(id=id)
+    #     if temp_job.status:
+    #         checked_list[id] = 'y'
+    #     else:
+    #         checked_list[id] = 'n'
+    parametrs = {'paginate': paginate, 
+                 # 'checked_list': checked_list,
+                 'jobs': temp_jobs,
+                 'count': count}
+    return render_template('parsing_result.html', title=title, parametrs=parametrs)
+
+
+@blueprint_app.route('/search/parsing-result/set-status-vacancy', methods=['POST'])
+@login_required
+def set_status_parsing_vacancy():
+    try:
+        if request.method == 'POST':
+            id_temp_vacancy = int(request.json['id'])
+            param = request.json['param']
+            temp_job = TempJob.query.filter_by(id=id_temp_vacancy)
+            if param == 'y':
+                temp_job.status = True
+            if param == 'n':
+                temp_job.status = False
+            db.session.add(temp_job)
+            db.session.commit()
+            return jsonify({'valid': 'True'}), 200
+    except:
+        return jsonify({'valid': 'False'}), 400
+
+@blueprint_app.route('/search/parsing-result/set-status-vacancies', methods=['POST'])
+@login_required
+def set_status_parsing_vacancies():
+    try:
+        if request.method == 'POST':
+            param = request.json['param']
+            if param == 'all':
+                temp_jobs = TempJob.query.all()
+            if param == 'favorites':
+                temp_jobs = TempJob.query.filter_by(status=True)
+            for vacancy in temp_jobs:
+                temp_job = Job(title=vacancy.title, 
+                               company=vacancy.company, 
+                               salary=vacancy.salary, 
+                               location=vacancy.location, 
+                               link=vacancy.link,
+                               source=vacancy.source)
+            db.session.add(temp_job)
+            db.session.commit()
+            return jsonify({'valid': 'True'}), 200
+    except:
+        return jsonify({'valid': 'False'}), 400
 
 
 @blueprint_app.errorhandler(404)
