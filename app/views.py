@@ -104,12 +104,6 @@ def report():
     return render_template('report.html', parametrs=parametrs, title=title)
 
 
-@blueprint_app.route('/parsing-results', methods=['GET', 'POST'])
-@login_required
-def parsing_results():
-    pass
-
-
 @blueprint_app.route('/favorites', methods=['GET', 'POST'])
 @login_required
 def favorites():
@@ -266,7 +260,7 @@ def stop_parsing():
     return jsonify({'parsing': 'stop'}), 200
 
 
-@blueprint_app.route('/search/parsing-result')
+@blueprint_app.route('/parsing-result')
 @login_required
 def parsing_result():
     count = TempJob.query.count()
@@ -279,29 +273,20 @@ def parsing_result():
         temp_jobs = TempJob.query.all()
         title = 'Parsing results'
         paginate = False
-    # checked_list = {}
-    # for job in temp_jobs.items:
-    #     id = job.id
-    #     temp_job = TempJob.query.filter_by(id=id)
-    #     if temp_job.status:
-    #         checked_list[id] = 'y'
-    #     else:
-    #         checked_list[id] = 'n'
     parametrs = {'paginate': paginate, 
-                 # 'checked_list': checked_list,
                  'jobs': temp_jobs,
                  'count': count}
     return render_template('parsing_result.html', title=title, parametrs=parametrs)
 
 
-@blueprint_app.route('/search/parsing-result/set-status-vacancy', methods=['POST'])
+@blueprint_app.route('/parsing-result/set-status-vacancy', methods=['POST'])
 @login_required
 def set_status_parsing_vacancy():
     try:
         if request.method == 'POST':
             id_temp_vacancy = int(request.json['id'])
             param = request.json['param']
-            temp_job = TempJob.query.filter_by(id=id_temp_vacancy)
+            temp_job = TempJob.query.filter_by(id=id_temp_vacancy).first()
             if param == 'y':
                 temp_job.status = True
             if param == 'n':
@@ -312,9 +297,9 @@ def set_status_parsing_vacancy():
     except:
         return jsonify({'valid': 'False'}), 400
 
-@blueprint_app.route('/search/parsing-result/set-status-vacancies', methods=['POST'])
+@blueprint_app.route('/parsing-result/add-parsing-vacancies', methods=['POST'])
 @login_required
-def set_status_parsing_vacancies():
+def add_parsing_vacancies():
     try:
         if request.method == 'POST':
             param = request.json['param']

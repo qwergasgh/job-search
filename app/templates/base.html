@@ -35,14 +35,14 @@
                 <li class="nav-item {% block FAVORITESPAGE %}{% endblock %}">
                   <a class="nav-link" aria-current="page" href="{{ url_for('blueprint_app.favorites') }}">
                     <!--Favorites-->
-                    <img src="static/img/favorites.png" alt="Favorites" vspace="0" align="center" height="25px">
+                    <img src="/static/img/favorites.png" alt="Favorites" vspace="0" align="center" height="25px">
                   </a>
                 </li>
                 <li class="nav-item dropdown {% block USERPAGE %}{% endblock %}">
                   <a class="nav-link dropdown-toggle" id="navbarDropdownMenuLink"
                     data-toggle="dropdown" aria-expanded="false">
                     <!--{{ current_user.user_name }}-->
-                    <img src="static/img/user.png" alt="Account" vspace="0" align="center" height="25px">
+                    <img src="/static/img/user.png" alt="Account" vspace="0" align="center" height="25px">
                   </a>
                   <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                     <a class="dropdown-item" href="/user/{{ current_user.user_name }}">{{ current_user.user_name }}</a>

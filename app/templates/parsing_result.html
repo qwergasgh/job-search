@@ -1,5 +1,19 @@
 {% extends 'base.html' %}
 
+{% if parametrs.jobs is not none %}
+
+{% block save %}
+    <li class="nav-item">
+        <a class="nav-link" href="/parsing-result/add-parsing-vacancies?param=all">
+            Add all
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" href="/parsing-result/add-parsing-vacancies?param=favorites">
+            Add favorites
+        </a>
+    </li>
+{% endblock %}
 
 {% block page_content %}
 <meta name="csrf-token" content="{{ csrf_token() }}">
@@ -8,39 +22,16 @@
             <thead>
             <tr>
                 <td align="center" colspan="6"> 
-                <b>Searching for &laquo;{{ parametrs.query_search }}&raquo; found {{ parametrs.count }}
+                <b>Parsing results found {{ parametrs.count }}
                     {% if parametrs.count == 1 %}
-                        job
+                        job.
                     {% else %}
                         jobs.
                     {% endif %}
                     {% if parametrs.paginate %}
                         Showing page {{ parametrs.jobs.page }} of {{ parametrs.temp_jobs.pages }}.
                     {% endif %}
-                </b></td></tr>
-                <tr>
-                <td align="center" colspan="6">
-                    <b>Set database<b>
-                    <select class="form-select form-select-lg-sm">
-                        <option selected>All</option>
-                        <option value='1'>Favorites</option>
-                    </select>
-                    <!--<div class="custom-control custom-switch col-3">
-                        <input id="all" type="checkbox" 
-                            class="custom-control-input"
-                            checked="n">
-                        <label class="custom-control-label", for="all">All</label>
-                    </div>
-                    <div class="custom-control custom-switch col-3">
-                        <input id="favorites" type="checkbox" 
-                            class="custom-control-input"
-                            checked="n">
-                        <label class="custom-control-label", for="favorites">Favorites</label>
-                    </div>-->
-                    <input type="button" 
-                           class="btn btn-outline-secondary"
-                           value="Apply modification" 
-                           onclick="set_database_favorites()">
+                </b>
                 </td>
             </tr>
             <tr>
@@ -66,8 +57,9 @@
                     <input id="{{job.id}}" 
                            class="custom-control-input"
                            type="checkbox" 
-                           onclick="status_temp_vacancy({{job.id}})"
-                           checked={% if job.status %}'y'{%else%}'n'{% endif %}>
+                           {% if job.status %}checked="y"{% endif %}
+                           onclick="status_temp_vacancy({{job.id}})">
+                           
                 </td>
                 <td><a href="{{ job.link }}" target="_blank">Open</a></td>
             </tr>
@@ -80,10 +72,12 @@
                 <td>{{ job.company }}</td>
                 <td>{{ job.salary }}</td>
                 <td>{{ job.location }}</td>
-                <td><input id="{{job.id}}" type="checkbox" 
-                    class="form-check-input"
-                    checked={% if job.status %}"y"{% else %}"n"{% endif %}
-                    onclick="status_temp_vacancy({{job.id}})"></td>
+                <td><input id="{{job.id}}" 
+                           class="form-check-input"
+                           type="checkbox" 
+                           {% if job.status %}checked="y"{% endif %}
+                           onclick="status_temp_vacancy({{job.id}})">
+                </td>
                 <td><a href="{{ job.link }}" target="_blank">Open</a></td>
             </tr>
             {% endfor %}
@@ -98,5 +92,5 @@
 {% block script %}
 <script src="/static/js/parsing_result.js"></script>
 {% endblock %}
-{% if parametrs.jobs is not none %}
+
 {% endif %}

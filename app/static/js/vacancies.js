@@ -8,24 +8,24 @@ $.ajaxSetup({
     }
 })
 
-
-function status_temp_vacancy(id) {
+function delete_vacancy(id) {
     id_vacancy = id.toString();
-    if (document.getElementById(id_vacancy).checked == 'y') {
-        document.getElementById(id_vacancy).removeAttribute('checked');
-        set_database(id_vacancy, 'n');
+    if (document.getElementById(id_vacancy).value == 'add') {
+        document.getElementById(id_vacancy).value='delete';
+        set_database(id_vacancy, 'add');
     }
     else {
-        document.getElementById(id_vacancy).checked='y';
-        set_database(id_vacancy, 'y');
+        document.getElementById(id_vacancy).value='add';
+        set_database(id_vacancy, 'delete');
     }
 }
+
 
 function set_database(id_vacancy, func_param) {
     // console.log(id_vacancy, func_param)
     $.ajax({
         type: 'POST',
-        url: '/parsing-result/set-status-vacancy',
+        url: '/report/set-status-vacancy',
         data: JSON.stringify({id: id_vacancy, param: func_param}),
         contentType: 'application/json',
         success: function(response) {

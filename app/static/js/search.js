@@ -30,7 +30,7 @@ $('#id_form_parsing').on('submit', function(event) {
                     $('.progress-bar-label').text(data.percentage + '%');
                     if (data.percentage == 100) {
                         clearInterval(timer);
-                        document.location.href = '/search/parsing-result';
+                        document.location.href = '/parsing-result';
                     }
                 });
             }, 5000);
@@ -49,72 +49,3 @@ $(window).on('beforeunload', function(event) {
         method: 'POST'
     });
 });
-
-// $(window).on('beforeunload', function() {
-//     $.ajax({
-//         url: '/search/stop-parsing',
-//         method: 'POST'
-//     });
-// });
-
-// $(window).on('unload', function() {
-//     $.ajax({
-//         url: '/search/stop-parsing',
-//         method: 'POST'
-//     });
-// });
-
-// $(window).on('onunload', function() {
-//     $.ajax({
-//         url: '/search/stop-parsing',
-//         method: 'POST'
-//     });
-// });
-
-// $(window).addEventListener('beforeunload', function(event) {
-//     event.preventDefault();
-//     $.ajax({
-//         url: '/search/stop-parsing',
-//         method: 'POST'
-//     });
-//     event.returnValue = '';
-// });
-
-//  $(window).addEventListener('unload', function(event) {
-//     event.preventDefault();
-//     $.ajax({
-//         url: '/search/stop-parsing',
-//         method: 'POST'
-//     });
-//     event.returnValue = '';
-//  });
-
-//  $(window).addEventListener('onunload', function(event) {
-//     event.preventDefault();
-//     $.ajax({
-//         url: '/search/stop-parsing',
-//         method: 'POST'
-//     });
-//     event.returnValue = '';
-//  });
-
-//  $(window).beforeunload(function() {
-//     $.ajax({
-//         url: '/search/stop-parsing',
-//         method: 'POST'
-//     });
-// });
-
-//  $(window).unload(function() {
-//     $.ajax({
-//         url: '/search/stop-parsing',
-//         method: 'POST'
-//     });
-// });
-
-// $(window).onunload(function() {
-//     $.ajax({
-//         url: '/search/stop-parsing',
-//         method: 'POST'
-//     });
-// });
