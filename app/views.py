@@ -1,6 +1,7 @@
+from crypt import methods
 from flask import Blueprint, render_template, request, redirect, send_file, url_for, abort, jsonify
 from flask_login.utils import login_required, login_user, logout_user, current_user
-from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm, ParsingForm
+from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm, ParsingForm, JobForm
 from .models import Job, User, Favorite, TempJob
 from .utils import save_to_csv, Parsing# update_percentage, get_percentage, parsing_vacancies
 from app import db
@@ -320,6 +321,73 @@ def add_parsing_vacancies():
     except:
         return jsonify({'valid': 'False'}), 400
 
+
+@blueprint_app.route('/vacancies/add-vacancy', methods=['GET', 'POST'])
+@login_required
+def add_vacancy():
+    title = 'Add vacancy'
+    formJob = JobForm()
+    if methods == 'POST':
+        title_vacancy= request.form.get('title')
+        company = request.form.get('company')
+        salary = request.form.get('salary')
+        location = request.form.get('location')
+        source = request.form.get('source')
+        link = request.form.get('link')
+        new_vacancy = Job(title=title_vacancy, 
+                          company=company,
+                          salary=salary,
+                          location=location,
+                          source=source,
+                          link=link)
+        db.session.add(new_vacancy)
+        db.session.commit()
+        return redirect(url_for('blueprint_app.vacancies'))
+    return render_template('add_vacancy.html', form=formJob, title=title)
+
+
+@blueprint_app.route('/vacancies')
+@login_required
+def vacancies():
+    count = Job.query.count()
+    if count > ROWS_PAGINATOR:
+        page = request.args.get('page', 1, type=int)
+        jobs = Job.query.paginate(page=page, per_page=ROWS_PAGINATOR)
+        title = f'Vacancies {page} page'
+        paginate = True
+    else:
+        jobs = Job.query.all()
+        title = 'Vacancies'
+        paginate = False
+    parametrs = {'jobs': jobs, 
+                 'count': count, 
+                 'paginate': paginate}
+    return render_template('report.html', parametrs=parametrs, title=title)
+
+
+@blueprint_app.route('/vacancies/delete-vacancy', methods=['POST'])
+@login_required
+def delete_vacancy():
+    try:
+        if request.method == 'POST':
+            id_vacancy = request.json['id_vacancy']
+            vacancy = Job.query.filter_by(id=id_vacancy)
+            db.session.delete(vacancy)
+            db.session.commit()
+            return redirect(url_for('blueprint_app.vacancies'))
+    except:
+        return jsonify({'valid': 'False'}), 400
+
+@blueprint_app.route('/vacancies/delete-vacancies', methods=['POST'])
+@login_required
+def delete_vacancies():
+    try:
+        if request.method == 'POST':
+            db.session.query(Job).delete()
+            db.session.commit()
+            return redirect(url_for('blueprint_app.vacancies'))
+    except:
+        return jsonify({'valid': 'False'}), 400
 
 @blueprint_app.errorhandler(404)
 def page_not_found(e):

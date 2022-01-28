@@ -127,3 +127,22 @@ class EditProfileForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super(EditProfileForm, self).__init__(*args, **kwargs)
+
+class JobForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    company = StringField('Company', validators=[DataRequired()])
+    salary = IntegerField('Salary', validators=[DataRequired()])
+    location = StringField('Location', validators=[DataRequired()])
+    source = StringField('Source', validators=[DataRequired()])
+    link = StringField('Link', validators=[DataRequired()])
+    submit_add = SubmitField('Add')
+
+    def __init__(self, *args, **kwargs):
+        super(JobForm, self).__init__(*args, **kwargs)
+
+    # def validate(self):
+    #     if self.query_search.data.strip() == "":
+    #         return False
+    #     if self.headhunter.data is False and self.stackoverflow.data is False:
+    #         return False
+    #     return True
