@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, request, redirect, send_file, url_
 from flask_login.utils import login_required, login_user, logout_user, current_user
 from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm, ParsingForm, JobForm
 from .models import Job, User, Favorite, TempJob
-from .utils import save_to_csv, Parsing# update_percentage, get_percentage, parsing_vacancies
+from .utils import save_to_csv, clear_tmp, Parsing# update_percentage, get_percentage, parsing_vacancies
 from app import db
 import os
 
@@ -20,7 +20,7 @@ ROWS_PAGINATOR = 20
 def home(): 
     return render_template('index.html', title='Job search')
 
-# method get or post add if else 
+
 @blueprint_app.route('/search', methods=['GET', 'POST'])
 @login_required
 def search():
@@ -58,8 +58,6 @@ def search():
                         stackoverflow = True
                     else:
                         stackoverflow = False
-                    # add parametr hh and so
-                    # parsing_vacancies(query_parsing, headhunter, stackoverflow)
                     p = Parsing(headhunter, stackoverflow, query_parsing)
                     p.parsing_vacancies()
     return render_template('search_form.html', title='Job search', privilege = privilege, 
@@ -85,11 +83,9 @@ def report():
         jobs = Job.query.all()
         title = 'Searching results'
         paginate = False
-    # id_jobs = []
     favorite_vacancies = {}
     for job in jobs.items:
         id = job.id
-        # id_jobs.append(id)
         favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id, 
                                                     id_vacancy=id).first()
         if favorite_vacancy is None:
@@ -97,7 +93,6 @@ def report():
         else:
             favorite_vacancies[id] = 'delete'
     parametrs = {'query_search': query_search,
-                 # 'id_jobs': id_jobs, 
                  'count': count, 
                  'paginate': paginate, 
                  'jobs': jobs, 
@@ -112,8 +107,6 @@ def favorites():
     id_list = []
     for v in vacancies_favorites:
         id_list.append(v.id_vacancy)
-    if len(id_list) == 0:
-        return redirect(request.url, code=302)
     jobs_filter = Job.query.filter(Job.id.in_(id_list))
     if len(id_list) > ROWS_PAGINATOR:
         page = request.args.get('page', 1, type=int)
@@ -155,6 +148,7 @@ def register():
 @blueprint_app.route('/user/logout')
 @login_required
 def logout():
+    clear_tmp(current_user.user_name)
     logout_user()
     return redirect(url_for('blueprint_app.home'))
 
@@ -298,52 +292,31 @@ def set_status_parsing_vacancy():
     except:
         return jsonify({'valid': 'False'}), 400
 
-@blueprint_app.route('/parsing-result/add-parsing-vacancies', methods=['POST'])
+
+@blueprint_app.route('/parsing-result/add-parsing-vacancies')
 @login_required
 def add_parsing_vacancies():
     try:
-        if request.method == 'POST':
-            param = request.json['param']
-            if param == 'all':
-                temp_jobs = TempJob.query.all()
-            if param == 'favorites':
-                temp_jobs = TempJob.query.filter_by(status=True)
-            for vacancy in temp_jobs:
-                temp_job = Job(title=vacancy.title, 
-                               company=vacancy.company, 
-                               salary=vacancy.salary, 
-                               location=vacancy.location, 
-                               link=vacancy.link,
-                               source=vacancy.source)
-            db.session.add(temp_job)
-            db.session.commit()
-            return jsonify({'valid': 'True'}), 200
-    except:
-        return jsonify({'valid': 'False'}), 400
-
-
-@blueprint_app.route('/vacancies/add-vacancy', methods=['GET', 'POST'])
-@login_required
-def add_vacancy():
-    title = 'Add vacancy'
-    formJob = JobForm()
-    if methods == 'POST':
-        title_vacancy= request.form.get('title')
-        company = request.form.get('company')
-        salary = request.form.get('salary')
-        location = request.form.get('location')
-        source = request.form.get('source')
-        link = request.form.get('link')
-        new_vacancy = Job(title=title_vacancy, 
-                          company=company,
-                          salary=salary,
-                          location=location,
-                          source=source,
-                          link=link)
-        db.session.add(new_vacancy)
+        param = request.args.get('param')
+        if param is None:
+            return redirect(url_for('blueprint_app.parsing_result'))
+        if param == 'all':
+            temp_jobs = TempJob.query.all()
+        if param == 'favorites':
+            temp_jobs = TempJob.query.filter_by(status=True)
+        for vacancy in temp_jobs:
+            temp_job = Job(title=vacancy.title, 
+                           company=vacancy.company, 
+                           salary=vacancy.salary, 
+                           location=vacancy.location, 
+                           link=vacancy.link,
+                           source=vacancy.source)
+        db.session.add(temp_job)
+        db.session.query(TempJob).delete()
         db.session.commit()
         return redirect(url_for('blueprint_app.vacancies'))
-    return render_template('add_vacancy.html', form=formJob, title=title)
+    except:
+        return redirect(url_for('blueprint_app.parsing_result'))
 
 
 @blueprint_app.route('/vacancies')
@@ -362,7 +335,31 @@ def vacancies():
     parametrs = {'jobs': jobs, 
                  'count': count, 
                  'paginate': paginate}
-    return render_template('report.html', parametrs=parametrs, title=title)
+    return render_template('vacancies.html', parametrs=parametrs, title=title)
+
+
+@blueprint_app.route('/vacancies/add-vacancy', methods=['GET', 'POST'])
+@login_required
+def add_vacancy():
+    title = 'Add vacancy'
+    formJob = JobForm()
+    if formJob.validate_on_submit():
+        title_vacancy= request.form.get('title')
+        company = request.form.get('company')
+        salary = request.form.get('salary')
+        location = request.form.get('location')
+        source = request.form.get('source')
+        link = request.form.get('link')
+        new_vacancy = Job(title=title_vacancy, 
+                          company=company,
+                          salary=salary,
+                          location=location,
+                          source=source,
+                          link=link)
+        db.session.add(new_vacancy)
+        db.session.commit()
+        return redirect(url_for('blueprint_app.vacancies'))
+    return render_template('add_vacancy.html', form=formJob, title=title)
 
 
 @blueprint_app.route('/vacancies/delete-vacancy', methods=['POST'])
@@ -370,14 +367,17 @@ def vacancies():
 def delete_vacancy():
     try:
         if request.method == 'POST':
-            id_vacancy = request.json['id_vacancy']
-            vacancy = Job.query.filter_by(id=id_vacancy)
+            id_vacancy = request.json['id']
+            if id_vacancy is None:
+                return jsonify({'valid': 'False'}), 400
+            vacancy = Job.query.filter_by(id=id_vacancy).first()
             db.session.delete(vacancy)
             db.session.commit()
-            return redirect(url_for('blueprint_app.vacancies'))
+            return jsonify({'valid': 'True'}), 200
     except:
         return jsonify({'valid': 'False'}), 400
 
+# test
 @blueprint_app.route('/vacancies/delete-vacancies', methods=['POST'])
 @login_required
 def delete_vacancies():
@@ -388,6 +388,7 @@ def delete_vacancies():
             return redirect(url_for('blueprint_app.vacancies'))
     except:
         return jsonify({'valid': 'False'}), 400
+
 
 @blueprint_app.errorhandler(404)
 def page_not_found(e):

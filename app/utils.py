@@ -9,6 +9,7 @@ import csv
 import time
 from .models import TempJob
 from app import db
+import os
 
 lock = Lock()
 
@@ -23,6 +24,17 @@ def save_to_csv(vacancies, file):
         return True
     except:
         return False
+
+
+def clear_tmp(user_name):
+    list_str = ['vacancies', 'favorites_vacancies']
+    for name in list_str:
+        try:
+            file = os.path.abspath(os.path.dirname(__file__)) + f'/tmp/{name}_for_{user_name}.csv'
+            os.remove(file)
+        except:
+            continue
+
 
 
 class Parsing():
