@@ -36,7 +36,6 @@ def clear_tmp(user_name):
             continue
 
 
-
 class Parsing():
     percentage = 0
     status_thread = False
@@ -131,6 +130,7 @@ class Parsing():
         self.percentage = 100
         lock.release()
 
+
 class ParsingProxyParametrs():
     def __init__(self):
         #self.gecko_path = os.path.abspath(os.path.dirname(__file__)) + '/geckodriver'
@@ -174,6 +174,7 @@ class ParsingProxyParametrs():
     def get_parametrs_for_parsing(self):
         return {'options': self.options,
                 'service': self.service}
+
 
 class ParsingUtil():
     def __init__(self, parsing_proxy_parametrs, query_parsing, url, str_page):
@@ -246,6 +247,7 @@ class ParsingUtil():
     def percentage(self, number):
         return number / self.max_page / 2
 
+
 class HeadHunter(ParsingUtil):
     # testing not soup !!!
     def _get_max_page(self, html):
@@ -271,7 +273,6 @@ class HeadHunter(ParsingUtil):
         salary = 666
         source = 'hh'
         return self._generate_dict_vacancy(title, company, location, link, salary, source)
-
 
 
 class StackOverflow(ParsingUtil):
