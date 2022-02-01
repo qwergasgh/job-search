@@ -1,9 +1,10 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-import flask_whooshalchemy as whooshalchemy
+from flask_msearch import Search
 from flask_login import UserMixin
 from datetime import datetime
 from app import db, login, app
 import jwt
+
 
 
 class Job(db.Model):
@@ -17,7 +18,6 @@ class Job(db.Model):
     link = db.Column(db.String(80), nullable=False)
     source = db.Column(db.String(80), nullable=False)
 
-#whooshalchemy.whoosh_index(app, Job)
 
 class TempJob(db.Model):
     __tablename__ = 'temp_vacancies'

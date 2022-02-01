@@ -5,6 +5,7 @@ from .models import Job, User, Favorite, TempJob
 from .utils import save_to_csv, clear_tmp, get_jobs, send_password_reset_email, Parsing
 from app import db
 import os
+from app import search
 
 
 
@@ -350,6 +351,7 @@ def add_vacancy():
                           link=link)
         db.session.add(new_vacancy)
         db.session.commit()
+        search.update_index(Job)
         return redirect(url_for('blueprint_app.vacancies'))
     return render_template('add_vacancy.html', form=formJob, title=title)
 
@@ -367,6 +369,7 @@ def delete_vacancy():
             db.session.delete(vacancy)
             db.session.delete(f_vacancy)
             db.session.commit()
+            search.update_index(Job)
             return jsonify({'valid': 'True'}), 200
     except:
         return jsonify({'valid': 'False'}), 400
@@ -379,6 +382,7 @@ def delete_vacancies():
         db.session.query(Job).delete()
         db.session.query(Favorite).delete()
         db.session.commit()
+        search.update_index(Job)
         return redirect(url_for('blueprint_app.vacancies'))
     except:
         return jsonify({'valid': 'False'}), 400

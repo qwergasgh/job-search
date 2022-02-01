@@ -14,6 +14,7 @@ from flask_mail import Message
 from app import mail
 from flask import render_template
 from app import app
+from app import search
 
 lock = Lock()
 
