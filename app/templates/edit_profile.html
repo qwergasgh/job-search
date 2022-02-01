@@ -31,6 +31,9 @@
       <label align="left">Email</label>
       {{ form.email(class="form-control forms-inputs", placeholder="Email") }}
     </div>
+    <div class="mb-3">
+      <a class="text-muted" href={{ url_for('blueprint_app.reset_password') }}>Edit password</a>
+    </div>
     <div align="right">
       {{ form.submit(class="btn btn-outline-secondary btn-block") }}
     </div>

@@ -1,11 +1,14 @@
 from werkzeug.security import generate_password_hash, check_password_hash
+import flask_whooshalchemy as whooshalchemy
 from flask_login import UserMixin
 from datetime import datetime
-from app import db, login
+from app import db, login, app
+import jwt
 
 
 class Job(db.Model):
     __tablename__ = 'vacancies'
+    __searchable__ = ['title']
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80), nullable=False)
     company = db.Column(db.String(80), nullable=False)
@@ -13,6 +16,8 @@ class Job(db.Model):
     salary = db.Column(db.Integer, nullable=False)
     link = db.Column(db.String(80), nullable=False)
     source = db.Column(db.String(80), nullable=False)
+
+#whooshalchemy.whoosh_index(app, Job)
 
 class TempJob(db.Model):
     __tablename__ = 'temp_vacancies'
@@ -67,6 +72,20 @@ class User(db.Model, UserMixin):
             return True
         else:
             return False
+
+    def get_reset_password_token(self, expires_in=600):
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': datetime.utcnow + expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return User.query.get(id)
 
 
 class Favorite(db.Model):

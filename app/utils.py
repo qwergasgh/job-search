@@ -7,9 +7,13 @@ import fake_useragent
 from threading import Thread, Lock
 import csv
 import time
-from .models import TempJob
+from .models import TempJob, Job
 from app import db
 import os
+from flask_mail import Message
+from app import mail
+from flask import render_template
+from app import app
 
 lock = Lock()
 
@@ -36,6 +40,39 @@ def clear_tmp(user_name):
             continue
 
 
+def get_jobs(query_parametrs):
+    jobs_filter = Job.query.whoosh_search(query_parametrs.query).all()
+    for job in jobs_filter:
+        print(job.title)
+    if query_parametrs.headhunter:
+        # jobs = jobs_filter.filter(city=)
+        pass
+
+
+def send_email(subject, sender, recipients, text_body, html_body):
+    msg = Message(subject, sender=sender, recipients=recipients)
+    msg.body = text_body
+    msg.html = html_body
+    Thread(target=send_email_start, args=(app, msg)).start()
+
+
+def send_email_start(app, msg):
+    with app.app_context():
+        mail.send(msg)
+
+
+def send_password_reset_email(user):
+    token = user.get_reset_password_token()
+    send_email('Reset Password',
+               sender=app.config['ADMINS'][0],
+               recipients=[user.email],
+               text_body=render_template('email/reser_password_email.txt',
+                                         user=user, token=token),
+               html_body=render_template('email/reset_password_email.html',
+                                         user=user, token=token))
+
+
+                                         
 class Parsing():
     percentage = 0
     status_thread = False
@@ -89,7 +126,7 @@ class Parsing():
     def _start(self):
         # ppp = ParsingProxyParametrs()
         # parsing_proxy_parametrs = ppp.get_parametrs_for_parsing()
-        # if self.headhunter:
+        # if self.headhunter == 'y':
         #     hh = HeadHunter(parsing_proxy_parametrs=parsing_proxy_parametrs,
         #                     url='https://hh.ru/search/vacancy?area=1&fromSearchLine=true&text=',
         #                     query_parsing=self.query_parsing, 
@@ -98,7 +135,7 @@ class Parsing():
         #     lock.acquire()
         #     self.vacancies.append(hh.get_vacancies())
         #     lock.release()
-        # if self.stackoverflow:
+        # if self.stackoverflow == 'y':
         #     so = StackOverflow(parsing_proxy_parametrs=parsing_proxy_parametrs,
         #                     url='https://stackoverflow.com/jobs?q=',
         #                     query_parsing=self.query_parsing,

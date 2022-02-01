@@ -1,9 +1,8 @@
-from crypt import methods
 from flask import Blueprint, render_template, request, redirect, send_file, url_for, abort, jsonify
 from flask_login.utils import login_required, login_user, logout_user, current_user
-from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm, ParsingForm, JobForm
+from .forms import LoginForm, RegisterForm, SearchForm, EditProfileForm, ParsingForm, JobForm, ResetPasswordForm, ResetPasswordForm_token
 from .models import Job, User, Favorite, TempJob
-from .utils import save_to_csv, clear_tmp, Parsing# update_percentage, get_percentage, parsing_vacancies
+from .utils import save_to_csv, clear_tmp, get_jobs, send_password_reset_email, Parsing
 from app import db
 import os
 
@@ -25,54 +24,45 @@ def home():
 @login_required
 def search():
     form_search = SearchForm()
-    if request.method == 'POST':
-        if request.form.get('submit_search') is not None:
-            if form_search.validate_on_submit():
-                query_search = request.form.get('query_search')
-                headhunter = request.form.get('headhunter')
-                stackoverflow = request.form.get('stackoverflow')
-                city = request.form.get('city')
-                state = request.form.get('state')
-                salary = request.form.get('salary')
-                return redirect(url_for('blueprint_app.report', 
-                                        query_search=query_search,
-                                        headhunter=headhunter,
-                                        stackoverflow=stackoverflow,
-                                        city=city,
-                                        state=state,
-                                        salary=salary))
+    if request.form.get('submit_search') is not None:
+        if form_search.validate_on_submit():
+            return redirect(url_for('blueprint_app.report', 
+                                    query_search=request.form.get('query_search'),
+                                    headhunter=request.form.get('headhunter'),
+                                    stackoverflow=request.form.get('stackoverflow'),
+                                    city=request.form.get('city'),
+                                    state=request.form.get('state'),
+                                    salary=request.form.get('salary')))
     privilege = current_user.is_administrator()
     if privilege:
         form_parsing = ParsingForm()
-        if request.method == 'POST':
-            query_parsing = request.form.get('query_parsing')
-            if query_parsing is not None:
-                if form_parsing.validate_on_submit():
-                    hh = request.form.get('headhunter')
-                    if hh == 'y':
-                        headhunter = True
-                    else:
-                        headhunter = False
-                    so = request.form.get('stackoverflow')
-                    if so == 'y':
-                        stackoverflow = True
-                    else:
-                        stackoverflow = False
-                    p = Parsing(headhunter, stackoverflow, query_parsing)
-                    p.parsing_vacancies()
-    return render_template('search_form.html', title='Job search', privilege = privilege, 
-                           form_search=form_search, form_parsing=form_parsing)
+        if form_parsing.validate_on_submit():
+            p = Parsing(request.form.get('headhunter'), 
+                        request.form.get('stackoverflow'), 
+                        request.form.get('query_parsing'))
+            p.parsing_vacancies()
+            return render_template('search_form.html', 
+                                   title='Job search', 
+                                   privilege = privilege, 
+                                   form_search=form_search, 
+                                   form_parsing=form_parsing)
+    return render_template('search_form.html', 
+                           title='Job search', 
+                           privilege = privilege, 
+                           form_search=form_search)
 
 
 @blueprint_app.route('/report', methods=['GET', 'POST'])
 @login_required
 def report():
     query_search = request.args.get('query_search')
-    headhunter = request.args.get('headhunter')
-    stackoverflow = request.args.get('stackoverflow')
-    city = request.args.get('city')
-    state = request.args.get('state')
-    salary = request.args.get('salary')
+    # jobs_filter = get_jobs({'query': query_search,
+    #                         'headhunter': request.args.get('headhunter'),
+    #                         'stackoverflow': request.args.get('stackoverflow'),
+    #                         'city': request.args.get('city'),
+    #                         'state': request.args.get('state'),
+    #                         'salary': request.args.get('salary')})
+    
     count = Job.query.count()
     if count > ROWS_PAGINATOR:
         page = request.args.get('page', 1, type=int)
@@ -84,14 +74,15 @@ def report():
         title = 'Searching results'
         paginate = False
     favorite_vacancies = {}
-    for job in jobs.items:
-        id = job.id
-        favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id, 
-                                                    id_vacancy=id).first()
-        if favorite_vacancy is None:
-            favorite_vacancies[id] = 'add'
-        else:
-            favorite_vacancies[id] = 'delete'
+    if len(jobs) > 0:
+        for job in jobs.items:
+            id = job.id
+            favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id, 
+                                                        id_vacancy=id).first()
+            if favorite_vacancy is None:
+                favorite_vacancies[id] = 'add'
+            else:
+                favorite_vacancies[id] = 'delete'
     parametrs = {'query_search': query_search,
                  'count': count, 
                  'paginate': paginate, 
@@ -228,7 +219,8 @@ def set_status_vacancy():
             id_vacancy = int(request.json['id'])
             param = request.json['param']
             if param == 'add':
-                favorite_vacancy = Favorite(id_user=id_user, id_vacancy=id_vacancy)
+                favorite_vacancy = Favorite(id_user=id_user, 
+                                            id_vacancy=id_vacancy).first()
                 db.session.add(favorite_vacancy)
             if param == 'delete':
                 favorite_vacancy = Favorite.query.filter_by(id_user=id_user, 
@@ -371,35 +363,66 @@ def delete_vacancy():
             if id_vacancy is None:
                 return jsonify({'valid': 'False'}), 400
             vacancy = Job.query.filter_by(id=id_vacancy).first()
+            f_vacancy = Favorite.query.fulter_by(id_vacancy=id_vacancy).first()
             db.session.delete(vacancy)
+            db.session.delete(f_vacancy)
             db.session.commit()
             return jsonify({'valid': 'True'}), 200
     except:
         return jsonify({'valid': 'False'}), 400
 
-# test
-@blueprint_app.route('/vacancies/delete-vacancies', methods=['POST'])
+
+@blueprint_app.route('/vacancies/delete-vacancies')
 @login_required
 def delete_vacancies():
     try:
-        if request.method == 'POST':
-            db.session.query(Job).delete()
-            db.session.commit()
-            return redirect(url_for('blueprint_app.vacancies'))
+        db.session.query(Job).delete()
+        db.session.query(Favorite).delete()
+        db.session.commit()
+        return redirect(url_for('blueprint_app.vacancies'))
     except:
         return jsonify({'valid': 'False'}), 400
 
 
+@blueprint_app.route('/user/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    if current_user.is_authenticated:
+        return redirect(url_for('blueprint_app.index'))
+    form = ResetPasswordForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user is not None:
+            send_password_reset_email(user)
+        return redirect(url_for('blueprint_app.login'))
+    return render_template('reset_password.html',
+                           title='Reset Password', form=form)
+
+
+@blueprint_app.route('/user/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password_token(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('blueprint_app.index'))
+    user = User.verify_reset_password_token(token)
+    if not user:
+        return redirect(url_for('blueprint_app.index'))
+    form = ResetPasswordForm_token()
+    if form.validate_on_submit():
+        user.set_password(form.password.data)
+        db.session.commit()
+        return redirect(url_for('blueprint_app.login'))
+    return render_template('reset_password_token.html', form=form)
+
+
 @blueprint_app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html', title="404 Not Found"), 404
+    return render_template('errors/404.html', title="404 Not Found"), 404
 
 
 @blueprint_app.errorhandler(500)
 def internal_server_error(e):
-    return render_template('500.html', title="500 Server Error"), 500
+    return render_template('errors/500.html', title="500 Server Error"), 500
 
 
 @blueprint_app.errorhandler(400)
 def bad_request(e):
-    return render_template('400.html', title="400 Bad Request"), 400
+    return render_template('errors/400.html', title="400 Bad Request"), 400

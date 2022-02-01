@@ -146,3 +146,32 @@ class JobForm(FlaskForm):
     #     if self.headhunter.data is False and self.stackoverflow.data is False:
     #         return False
     #     return True
+
+
+class ResetPasswordForm(FlaskForm):
+    email = EmailField('Email',
+                       validators=[DataRequired(), Email(), Length(min=3, max=64)])
+    submit = SubmitField('Reset Password')
+
+    def __init__(self, *args, **kwargs):
+        super(ResetPasswordForm, self).__init__(*args, **kwargs)
+
+    def validate(self):
+        initial_validation = super(ResetPasswordForm, self).validate()
+        if not initial_validation:
+            return False
+        user = User.query.filter_by(email=self.email.data).first()
+        if user is not None:
+            self.email.errors.append("Email Error")
+            return False
+        return True
+
+
+
+class ResetPasswordForm_token(FlaskForm):
+    password = PasswordField('Password',
+                             validators=[DataRequired(), Length(min=8, max=64)])
+    confirm = PasswordField('Verify password',
+                            validators=[DataRequired(), EqualTo('password',
+                                                                message='Passwords must match')])
+    submit = SubmitField('Reset Password')
