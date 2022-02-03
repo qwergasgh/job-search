@@ -5,7 +5,7 @@ from .models import Job, User, Favorite, TempJob
 from .utils import save_to_csv, clear_tmp, get_jobs, send_password_reset_email, Parsing
 from app import db
 import os
-from app import search
+# from app import search
 
 
 
