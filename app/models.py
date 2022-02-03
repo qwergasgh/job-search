@@ -112,3 +112,12 @@ def user_loader(user_id):
 # @login.unauthorized_handler
 # def unauthorized_handler():
 #    return 'unauthorized'
+
+# from flask_admin import Admin
+# from flask_admin.contrib.sqla import ModelView
+# admin = Admin(app)
+# admin.add_view(ModelView(Job, db.session))
+# admin.add_view(ModelView(TempJob, db.session))
+# admin.add_view(ModelView(Favorite, db.session))
+# admin.add_view(ModelView(Role, db.session))
+# admin.add_view(ModelView(User, db.session))

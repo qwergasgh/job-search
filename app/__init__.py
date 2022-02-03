@@ -22,6 +22,7 @@ mail = Mail(app)
 # search = Search(db=db)
 # search.init_app(app)
 
+
 login = LoginManager(app)
 login.session_protection = 'strong'
 login.login_view = 'blueprint_app.login'
