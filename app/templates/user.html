@@ -11,7 +11,7 @@
     <p><b>Phonenumber: <b/>{{ user.phonenumber }}</p>
     <p><b>Registration date: <b/>{{ user.created }}</p>
     {% if user == current_user %}
-        <a class="btn btn-outline-secondary" href="{{ url_for('blueprint_app.edit_profile') }}">
+        <a class="btn btn-outline-secondary" href="{{ url_for('blueprint_user.edit_profile') }}">
             Edit profile
         </a>
     {% endif %}
