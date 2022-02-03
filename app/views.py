@@ -34,23 +34,17 @@ def search():
                                     city=request.form.get('city'),
                                     state=request.form.get('state'),
                                     salary=request.form.get('salary')))
-    privilege = current_user.is_administrator()
-    if privilege:
+    if current_user.is_administrator():
         form_parsing = ParsingForm()
         if form_parsing.validate_on_submit():
             p = Parsing(request.form.get('headhunter'), 
                         request.form.get('stackoverflow'), 
                         request.form.get('query_parsing'))
             p.parsing_vacancies()
-            return render_template('search_form.html', 
-                                   title='Job search', 
-                                   privilege = privilege, 
-                                   form_search=form_search, 
-                                   form_parsing=form_parsing)
     return render_template('search_form.html', 
                            title='Job search', 
-                           privilege = privilege, 
-                           form_search=form_search)
+                           form_search=form_search, 
+                           form_parsing=form_parsing)
 
 
 @blueprint_app.route('/report', methods=['GET', 'POST'])

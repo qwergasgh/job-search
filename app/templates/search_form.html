@@ -5,16 +5,11 @@
 {% block page_content %}
 <br>
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<p class="lead">Search Panel</p>
 <div class="container col-4 border">
-    <br>
-    <!--<form class="align-items-center" method="POST" action={{ url_for('blueprint_app.report') }} novalidate>-->
     <form id="id_form_search" class="align-items-center" method="POST">
         {{ form_search.hidden_tag() }}
-        <div class="mb-3">
-            <label>Search Panel</label>
-        </div>
-        
-        <div class="mb-3">
+        <div class="mb-3 pt-3">
             {{ form_search.query_search(class="form-control", placeholder="Request") }}
         </div>
 
@@ -33,18 +28,18 @@
             </div>
         </div>
 
-        <div class="row mb-3">
-            <div class="custom-control custom-switch col-3">
+        <div class="mb-3 row align-items-center">
+            <div class="custom-control custom-switch col order-first">
                 {{ form_search.headhunter(id="check_hh_search", class="custom-control-input", type="checkbox", checked="y") }}
                 <label class="custom-control-label", for="check_hh_search">HeadHunter</label>
             </div>
 
-            <div class="custom-control custom-switch col-3">
+            <div class="custom-control custom-switch col">
                 {{ form_search.stackoverflow(id="check_so_search", class="custom-control-input", type="checkbox") }}
                 <label class="custom-control-label", for="check_so_search">StackOverflow</label>
             </div>
 
-            <div class="btn-group col-6">
+            <div class="btn-group col order-last">
                 <button type="reset" class="btn btn-outline-secondary">Clear</button>
                 {{ form_search.submit_search(id="search", class="btn btn-outline-secondary") }}
             </div>
@@ -52,31 +47,27 @@
     </form>
 </div>
 <br>
-{% if privilege %}
+{% if current_user.is_administrator() %}
+<p class="lead">Parsing Panel</p>
 <div class="container col-4 border">    
-    <br>
     <form id="id_form_parsing" class="align-items-center" method="POST">
         {{ form_parsing.hidden_tag() }}
-        <div class="mb-3">
-            <label>Parsing Panel</label>
-        </div>
-
-        <div class="mb-3">
+        <div class="mb-3 pt-3">
             {{ form_parsing.query_parsing(class="form-control", placeholder="Request") }}
         </div>
 
-        <div class="row mb-3">
-            <div class="custom-control custom-switch col-3">
+        <div class="mb-3 row align-items-center">
+            <div class="custom-control custom-switch col order-first">
                 {{ form_parsing.headhunter(id="check_hh_parsing", class="custom-control-input", type="checkbox", checked="y") }}
                 <label class="custom-control-label", for="check_hh_parsing">HeadHunter</label>
             </div>
 
-            <div class="custom-control custom-switch col-3">
+            <div class="custom-control custom-switch col">
                 {{ form_parsing.stackoverflow(id="check_so_parsing", class="custom-control-input", type="checkbox") }}
                 <label class="custom-control-label", for="check_so_parsing">StackOverflow</label>
             </div>
 
-            <div class="btn-group col-6">
+            <div class="btn-group col order-last">
                 <button type="reset" class="btn btn-outline-secondary">Clear</button>
                 {{ form_parsing.submit_parsing(id="parsing", class="btn btn-outline-secondary") }}
             </div>
