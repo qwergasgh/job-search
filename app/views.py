@@ -291,6 +291,7 @@ def add_parsing_vacancies():
             temp_jobs = TempJob.query.all()
         if param == 'favorites':
             temp_jobs = TempJob.query.filter_by(status=True)
+        new_jobs = []
         for vacancy in temp_jobs:
             temp_job = Job(title=vacancy.title, 
                            company=vacancy.company, 
@@ -298,7 +299,8 @@ def add_parsing_vacancies():
                            location=vacancy.location, 
                            link=vacancy.link,
                            source=vacancy.source)
-        db.session.add(temp_job)
+            new_jobs.append(temp_job)
+        db.session.add(new_jobs)
         db.session.query(TempJob).delete()
         db.session.commit()
         return redirect(url_for('blueprint_app.vacancies'))

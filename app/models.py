@@ -87,7 +87,7 @@ class User(db.Model, UserMixin):
             return
         return User.query.get(id)
 
-
+# many to many !!!
 class Favorite(db.Model):
     __tablename__ = 'favorites'
     id = db.Column(db.Integer, primary_key=True)

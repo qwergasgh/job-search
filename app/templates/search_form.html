@@ -44,6 +44,16 @@
                 {{ form_search.submit_search(id="search", class="btn btn-outline-secondary") }}
             </div>
         </div>
+        <!--Errors-->
+        {% if form_search.errors %}
+        <ul class="errors">
+            {% for field_name, field_errors in form_search.errors|dictsort if field_errors %}
+                {% for error in field_errors %}
+                    <li>{{ form_search[field_name].label }}: {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+        {% endif %}
     </form>
 </div>
 <br>

@@ -131,7 +131,7 @@ class EditProfileForm(FlaskForm):
 class JobForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     company = StringField('Company', validators=[DataRequired()])
-    salary = IntegerField('Salary', validators=[DataRequired()])
+    salary = IntegerField('Salary', validators=[DataRequired(message="Only numbers")])
     location = StringField('Location', validators=[DataRequired()])
     source = StringField('Source', validators=[DataRequired()])
     link = StringField('Link', validators=[DataRequired()])
