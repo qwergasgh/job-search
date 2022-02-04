@@ -6,12 +6,12 @@
 
 {% block save %}
     <li class="nav-item">
-        <a class="nav-link" href="/vacancies/add-vacancy">
+        <a class="nav-link" href="{{ url_for('blueprint_vacancies.add-vacancy') }}">
             Add vacancy
         </a>
     </li>
     <li class="nav-item">
-        <a class="nav-link" href="/vacancies/delete-vacancies">
+        <a class="nav-link" href="{{ url_for('blueprint_vacancies.delete_vacancies') }}">
             Delete all
         </a>
     </li>

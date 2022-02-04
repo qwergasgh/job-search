@@ -6,7 +6,7 @@
 
 {% block save %}
     <li class="nav-item">
-        <a class="nav-link" href="/export?vacancies=favorites">
+        <a class="nav-link" href="{{ url_for('blueprint_app.export', vacancies=favorites) }}">
             <img src="{{ url_for('static', filename='img/csv.png') }}" alt="Save favorites to CSV" vspace="0" align="center" height="25px">
         </a>
     </li>
