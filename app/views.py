@@ -24,9 +24,12 @@ def home():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        user = User(email=form.email.data, user_name=form.user_name.data,
-                    first_name=form.first_name.data, last_name=form.last_name.data,
-                    phonenumber=form.phonenumber.data, password=form.password.data)
+        user = User(email=form.email.data, 
+                    user_name=form.user_name.data,
+                    first_name=form.first_name.data, 
+                    last_name=form.last_name.data,
+                    phonenumber=form.phonenumber.data, 
+                    password=form.password.data)
         db.session.add(user)
         db.session.commit()
         return redirect(url_for('blueprint_user.login'))
