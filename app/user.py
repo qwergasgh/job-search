@@ -20,7 +20,7 @@ def login():
         if user is not None and user.verify_password(form.password.data):
             login_user(user)
             return redirect(url_for('blueprint_app.home'))
-    return render_template('login.html', title='Login', form=form)
+    return render_template('user/login.html', title='Login', form=form)
 
 
 @blueprint_user.route('/logout')
@@ -37,7 +37,7 @@ def user(username):
     user = User.query.filter_by(user_name=username).first()
     if user is None:
         abort(404)
-    return render_template('user.html', user=user, title='User page')
+    return render_template('user/user.html', user=user, title='User page')
 
 
 @blueprint_user.route('/edit-profile', methods=['GET', 'POST'])
@@ -62,7 +62,7 @@ def edit_profile():
     form.last_name.data = current_user.last_name
     form.phonenumber.data = current_user.phonenumber
     # form.password.data = current_user.password
-    return render_template('edit_profile.html', 
+    return render_template('user/edit_profile.html', 
                            title="Edit profile", 
                            form=form, 
                            name=name)
@@ -78,7 +78,7 @@ def reset_password():
         if user is not None:
             send_password_reset_email(user)
         return redirect(url_for('blueprint_user.login'))
-    return render_template('reset_password.html',
+    return render_template('user/reset_password.html',
                            title='Reset Password', 
                            form=form)
 
@@ -95,4 +95,4 @@ def reset_password_token(token):
         user.set_password(form.password.data)
         db.session.commit()
         return redirect(url_for('blueprint_user.login'))
-    return render_template('reset_password_token.html', form=form)
+    return render_template('user/reset_password_token.html', form=form)

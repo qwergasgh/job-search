@@ -29,7 +29,7 @@ def vacancies():
     parametrs = {'jobs': jobs, 
                  'count': count, 
                  'paginate': paginate}
-    return render_template('vacancies.html', parametrs=parametrs, title=title)
+    return render_template('vacancies/vacancies.html', parametrs=parametrs, title=title)
 
 
 @blueprint_vacancies.route('/favorites', methods=['GET', 'POST'])
@@ -50,7 +50,7 @@ def favorites():
         title = 'Favorites vacancies'
         paginate = False
     parametrs = {'paginate': paginate, 'jobs': jobs}
-    return render_template('favorites.html', parametrs=parametrs, title=title)
+    return render_template('vacancies/favorites.html', parametrs=parametrs, title=title)
 
 
 @blueprint_vacancies.route('/add-vacancy', methods=['GET', 'POST'])
@@ -75,7 +75,7 @@ def add_vacancy():
         db.session.commit()
         # search.update_index(Job)
         return redirect(url_for('blueprint_vacancies.vacancies'))
-    return render_template('add_vacancy.html', form=formJob, title=title)
+    return render_template('vacancies/add_vacancy.html', form=formJob, title=title)
 
 
 @blueprint_vacancies.route('/delete-vacancy', methods=['POST'])
