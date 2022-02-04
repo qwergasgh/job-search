@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
 from flask_login.utils import login_required, current_user
 from .forms import SearchForm, ParsingForm
-from .utils import Parsing
+from parsing import Parsing
 
 
 blueprint_search = Blueprint('blueprint_search', 
