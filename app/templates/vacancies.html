@@ -38,7 +38,6 @@
                 </td>
             </tr>
             <tr>
-                <!--<th>Number</th>-->
                 <th>Title</th>
                 <th>Company</th>
                 <th>Salary</th>
@@ -52,7 +51,6 @@
             {% if parametrs.paginate %}
             {% for job in parametrs.jobs.items %}
             <tr>
-                <!--<td>{{ job.id }}</td>-->
                 <td>{{ job.title }}</td>
                 <td>{{ job.company }}</td>
                 <td>{{ job.salary }}</td>
@@ -70,7 +68,6 @@
             {% else %}
             {% for job in parametrs.jobs %}
             <tr>
-                <!--<td>{{ job.id }}</td>-->
                 <td>{{ job.title }}</td>
                 <td>{{ job.company }}</td>
                 <td>{{ job.salary }}</td>
@@ -94,7 +91,7 @@
 {% endblock %}
 
 {% block script %}
-<script src="/static/js/vacancies.js"></script>
+<script src="{{ url_for('static', filename='js/vacancies.js') }}"></script>
 {% endblock %}
 
 {% endif %}

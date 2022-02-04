@@ -6,9 +6,10 @@ from app.views import ROWS_PAGINATOR
 from app import db
 import os
 
-blueprint_vacancies = Blueprint('blueprint_vacancies', __name__,
-                          template_folder='templates', 
-                          static_folder='static')
+blueprint_vacancies = Blueprint('blueprint_vacancies', 
+                                __name__,
+                                template_folder='templates', 
+                                static_folder='static')
 
 
 

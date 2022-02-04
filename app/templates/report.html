@@ -6,7 +6,7 @@
 {% block save %}
     <li class="nav-item">
         <a class="nav-link" href="/export?vacancies=all">
-            <img src="static/img/csv.png" alt="Save all to CSV" vspace="0" align="center" height="25px">
+            <img src="{{ url_for('static', filename='img/csv.png') }}" alt="Save all to CSV" vspace="0" align="center" height="25px">
         </a>
     </li>
 {% endblock %}
@@ -78,7 +78,7 @@
 {% endblock %}
 
 {% block script %}
-<script src="/static/js/favorites.js"></script>
+<script src="{{ url_for('static', filename='js/favorites.js') }}"></script>
 {% endblock %}
 
 {% endif %}

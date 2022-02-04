@@ -7,8 +7,7 @@
 {% block save %}
     <li class="nav-item">
         <a class="nav-link" href="/export?vacancies=favorites">
-            <!--Save favorites to CSV-->
-            <img src="static/img/csv.png" alt="Save favorites to CSV" vspace="0" align="center" height="25px">
+            <img src="{{ url_for('static', filename='img/csv.png') }}" alt="Save favorites to CSV" vspace="0" align="center" height="25px">
         </a>
     </li>
 {% endblock %}
@@ -23,7 +22,6 @@
                 </b></td>
             </tr>
             <tr>
-                <!--<th>Id</th>-->
                 <th>Title</th>
                 <th>Company</th>
                 <th>Salary</th>
@@ -35,7 +33,6 @@
             {% if parametrs.paginate %}
             {% for job in parametrs.jobs.items %}
             <tr>
-                <!--<td>{{ job.id }}</td>-->
                 <td>{{ job.title }}</td>
                 <td>{{ job.company }}</td>
                 <td>{{ job.salary }}</td>
@@ -46,7 +43,6 @@
             {% else %}
             {% for job in parametrs.jobs %}
             <tr>
-                <!--<td>{{ job.id }}</td>-->
                 <td>{{ job.title }}</td>
                 <td>{{ job.company }}</td>
                 <td>{{ job.salary }}</td>
@@ -61,7 +57,7 @@
     </div><br>
 {% endblock %}
 {% block script %}
-<script src="/static/js/favorites.js"></script>
+<script src="{{ url_for('static', filename='js/favorites.js') }}"></script>
 {% endblock %}
 
 {% endif %}

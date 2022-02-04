@@ -31,11 +31,17 @@ from .views import blueprint_app
 from .errors import blueprint_errors
 from .vacancies import blueprint_vacancies
 from .user import blueprint_user
+from .parsing_result import blueprint_parsing_result
+from .search import blueprint_search
+from .report import blueprint_report
 
 app.register_blueprint(blueprint_app)
 app.register_blueprint(blueprint_errors)
 app.register_blueprint(blueprint_vacancies, url_prefix="/vacancies")
 app.register_blueprint(blueprint_user, url_prefix="/user")
+app.register_blueprint(blueprint_parsing_result, url_prefix="/parsing-result")
+app.register_blueprint(blueprint_search, url_prefix="/search")
+app.register_blueprint(blueprint_report, url_prefix="/report")
 
 
 

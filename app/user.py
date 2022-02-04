@@ -6,9 +6,10 @@ from .utils import clear_tmp, send_password_reset_email
 from app import db
 
 
-blueprint_user = Blueprint('blueprint_user', __name__,
-                          template_folder='templates', 
-                          static_folder='static')
+blueprint_user = Blueprint('blueprint_user', 
+                           __name__,
+                           template_folder='templates', 
+                           static_folder='static')
 
 
 @blueprint_user.route('/login', methods=['GET', 'POST'])
@@ -78,7 +79,8 @@ def reset_password():
             send_password_reset_email(user)
         return redirect(url_for('blueprint_user.login'))
     return render_template('reset_password.html',
-                           title='Reset Password', form=form)
+                           title='Reset Password', 
+                           form=form)
 
 
 @blueprint_user.route('/reset_password/<token>', methods=['GET', 'POST'])
