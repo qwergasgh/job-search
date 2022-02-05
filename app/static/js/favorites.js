@@ -38,3 +38,9 @@ function set_database(id_vacancy, func_param) {
         }
     });
 }
+
+function delete_vacancy(id) {
+    id_vacancy = id.toString();
+    set_database(id_vacancy, 'delete');
+    document.location.href = '/vacancies/favorites';
+}

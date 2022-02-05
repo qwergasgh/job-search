@@ -6,7 +6,7 @@
 
 {% block save %}
     <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('blueprint_vacancies.add-vacancy') }}">
+        <a class="nav-link" href="{{ url_for('blueprint_vacancies.add_vacancy') }}">
             Add vacancy
         </a>
     </li>
@@ -85,13 +85,10 @@
             {% endif %}
             </tbody>
         </table>
-        {% if parametrs.paginate %}{% include 'paginator.html' %}{% endif %}
+        {% if parametrs.paginate %}{% include 'vacancies/paginator_vacancies.html' %}{% endif %}
     </div><br>
-
 {% endblock %}
-
 {% block script %}
 <script src="{{ url_for('static', filename='js/vacancies.js') }}"></script>
 {% endblock %}
-
 {% endif %}

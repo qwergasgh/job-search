@@ -22,10 +22,8 @@ mail = Mail(app)
 # search = Search(db=db)
 # search.init_app(app)
 
-
 login = LoginManager(app)
 login.session_protection = 'strong'
-login.login_view = 'blueprint_app.login'
 
 from .views import blueprint_app
 from .errors import blueprint_errors
@@ -43,6 +41,6 @@ app.register_blueprint(blueprint_parsing_result, url_prefix="/parsing-result")
 app.register_blueprint(blueprint_search, url_prefix="/search")
 app.register_blueprint(blueprint_report, url_prefix="/report")
 
-
+login.login_view = 'blueprint_user.login'
 
 

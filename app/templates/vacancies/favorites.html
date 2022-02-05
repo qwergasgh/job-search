@@ -27,6 +27,7 @@
                 <th>Salary</th>
                 <th>Location</th>
                 <th>Link</th>
+                <th>Action</th>
             </tr>
             </thead>
             <tbody>
@@ -38,6 +39,12 @@
                 <td>{{ job.salary }}</td>
                 <td>{{ job.location }}</td>
                 <td><a href="{{ job.link }}" target="_blank">Open</a></td>
+                <td>
+                    <input type="button"
+                           class="btn btn-outline-secondary"
+                           value="delete"
+                           onclick="delete_vacancy({{job.id}})">
+                </td>
             </tr>
             {% endfor %}
             {% else %}
@@ -48,16 +55,21 @@
                 <td>{{ job.salary }}</td>
                 <td>{{ job.location }}</td>
                 <td><a href="{{ job.link }}" target="_blank">Open</a></td>
+                <td>
+                    <input type="button"
+                           class="btn btn-outline-secondary"
+                           value="delete"
+                           onclick="delete_vacancy({{job.id}})">
+                </td>
             </tr>
             {% endfor %}
             {% endif %}
             </tbody>
         </table>
-        {% if parametrs.paginate %}{% include 'paginator.html' %}{% endif %}
+        {% if parametrs.paginate %}{% include 'vacancies/paginator_favorites.html' %}{% endif %}
     </div><br>
 {% endblock %}
 {% block script %}
 <script src="{{ url_for('static', filename='js/favorites.js') }}"></script>
 {% endblock %}
-
 {% endif %}

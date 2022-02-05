@@ -27,7 +27,7 @@ def parsing_result():
     parametrs = {'paginate': paginate, 
                  'jobs': temp_jobs,
                  'count': count}
-    return render_template('parsing_result.html', title=title, parametrs=parametrs)
+    return render_template('parsing_result/parsing_result.html', title=title, parametrs=parametrs)
 
 
 @blueprint_parsing_result.route('/set-status-vacancy', methods=['POST'])

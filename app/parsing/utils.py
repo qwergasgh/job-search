@@ -1,20 +1,22 @@
-from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 from subprocess import Popen, PIPE
-from bs4 import BeautifulSoup
 import fake_useragent
-from parsing import Parsing
-from threading import Lock
+import re
+from sys import platform
 
-lock = Lock()
 
 class ParsingProxyParametrs():
     def __init__(self):
-        #self.gecko_path = os.path.abspath(os.path.dirname(__file__)) + '/geckodriver'
-        self.gecko_path = '/usr/bin/geckodriver'
-        self.binary_path = '/usr/bin/firefox'
-        self.tor_path = '/usr/bin/tor'
+        if platform == 'linux':
+            # self.gecko_path = os.path.abspath(os.path.dirname(__file__)) + '/geckodriver'
+            self.gecko_path = '/usr/bin/geckodriver'
+            self.binary_path = '/usr/bin/firefox'
+            self.tor_path = '/usr/bin/tor'
+        if platform.index('win') > -1:
+            self.gecko_path = r'C:\Program Files\Mozilla Firefox\geckodriver.exe'
+            self.binary_path = r'C:\Program Files\Mozilla Firefox\firefox.exe'
+            self.tor_path = r'C:\Program Files\TorBrowser\Bundle\Tor\tor.exe'
         self.tor = self._create_tor()
         self.options = self._create_options()
         self.service = Service(executable_path=self.gecko_path)
@@ -38,10 +40,10 @@ class ParsingProxyParametrs():
     def _create_options(self):
         options = Options()
         options.binary_location = self.binary_path
-        options.set_preference('network.proxy.type', 1)
-        options.set_preference('network.proxy.socks', '127.0.0.1')
-        options.set_preference('network.proxy.socks_port', 9050)
-        options.set_preference("network.proxy.socks_remote_dns", True)
+        # options.set_preference('network.proxy.type', 1)
+        # options.set_preference('network.proxy.socks', '127.0.0.1')
+        # options.set_preference('network.proxy.socks_port', 9050)
+        # options.set_preference("network.proxy.socks_remote_dns", True)
         return options
 
     def close_tor(self):
@@ -54,74 +56,35 @@ class ParsingProxyParametrs():
                 'service': self.service}
 
 
-class ParsingUtil():
-    def __init__(self, parsing_proxy_parametrs, query_parsing, url, str_page):
-        self.parametrs = parsing_proxy_parametrs
-        self.query = query_parsing
-        self.url = url
-        self.str_page = str_page
-        self.max_page = 0
-        self.vacancies = []
-        self._set_fake_useragent()
+def get_fake_useragent():
+    try:
+        return fake_useragent.UserAgent().random
+    except:
+        return 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:96.0) Gecko/20100101 Firefox/96.0'
 
-    # testing !!!
-    def _set_fake_useragent(self):
-        self.parametrs['options'].set_preference('general.useragent.override', 
-                                                 self._get_fake_useragent())
 
-    def _get_fake_useragent(self):
-        try:
-            return fake_useragent.UserAgent().random
-        except:
-            # add useragent !!!
-            return ''
+def generate_dict_vacancy(title, company, location, link, salary, source):
+    return {'title': title,
+            'company': company,
+            'location': location,
+            'link': link,
+            'salary': salary,
+            'source': source}
 
-    def _get_max_page(self, html):
-        pass
 
-    def _find_vacancies(self, html):
-        pass
-
-    def _create_vacancy(self, html):
-        pass
-
-    def _generate_dict_vacancy(self, title, company, location, link, salary, source):
-        return {'title': title, 
-                'company': company, 
-                'location': location, 
-                'link': link,
-                'salary': salary,
-                'source': source}
-
-    def parsing(self):
-        try:
-            with Firefox(options=self.parametrs['options'], service=self.parametrs['service']) as driver:
-                driver.get(url=f'{self.url}{self.query}')
-                self.max_page = self._get_max_page(driver.page_source)
-                for page in range(self.max_page):
-
-                    if not Parsing.get_status_thread:
-                        return
-
-                    # number page testing !!!
-                    driver.get(url=f'{self.url}{self.query}{self.str_page}{page}')
-                    html = driver.page_source
-                    if  html is not None:
-                        self._find_vacancies(html)
-                        self._set_fake_useragent()
-                        # tesiting !!!
-                        lock.acquire()
-                        Parsing.update_percentage(int(page))
-                        lock.release()
-        except:
-            lock.acquire()
-            Parsing.update_percentage(100)
-            print('error parsing')
-            lock.release()
-
-    def get_vacancies(self):
-        return self.vacancies
-
-    def percentage(self, number):
-        return number / self.max_page / 2
-
+def find_salary(salary_result):
+    print(salary_result)
+    if salary_result is not None:
+        salary_result_values = re.findall('[0-9]+', salary_result)
+        print(salary_result_values)
+        print(type(salary_result_values))
+        if type(salary_result_values) == int:
+            return salary_result_values
+        if type(salary_result_values) == list:
+            if len(salary_result_values) > 2:
+                return int(str((int(salary_result_values[0]) + int(salary_result_values[2])) / 2) + '000')
+            if len(salary_result_values) == 2:
+                return int((salary_result_values[0] + '000'))
+            return int(str((int(salary_result_values[0]) + int(salary_result_values[1])) / 2) + '000')
+    else:
+        return None

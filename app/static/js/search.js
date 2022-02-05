@@ -12,19 +12,19 @@ $('#id_form_parsing').on('submit', function(event) {
     console.log('in function submit parsing');
     event.preventDefault();
     $.ajax({
-        url: '/search',
+        url: '/search/',
         method: 'POST',
         data: $(this).serialize(),
         beforeSend:function() {
             $('#parsing').attr('disabled', 'disabled');
             $('#process').css('display', 'block');
-            $('.progress-bar').css('width', '2%');
-            $('.progress-bar-label').text('2%');
+            $('.progress-bar').css('width', '0%');
+            $('.progress-bar-label').text('0%');
         },
         success:function(response) {
             //console.log(response);
             var timer = setInterval(function() {
-                $.getJSON('/search/parsing', {}, function(data) {
+                $.getJSON('/search/progress-parsing', {}, function(data) {
                     //console.log(data);
                     $('.progress-bar').css('width', data.percentage + '%');
                     $('.progress-bar-label').text(data.percentage + '%');
@@ -33,7 +33,7 @@ $('#id_form_parsing').on('submit', function(event) {
                         document.location.href = '/parsing-result';
                     }
                 });
-            }, 5000);
+            }, 50000);
         },
         error: function(error) {
             console.log(error);
