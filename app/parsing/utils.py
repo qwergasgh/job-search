@@ -73,7 +73,6 @@ def generate_dict_vacancy(title, company, location, link, salary, source):
 
 
 def find_salary(salary_result):
-    print(salary_result)
     if salary_result is not None:
         salary_result_values = re.findall('[0-9]+', salary_result)
         print(salary_result_values)
