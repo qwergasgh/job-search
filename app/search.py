@@ -14,26 +14,34 @@ blueprint_search = Blueprint('blueprint_search',
 @login_required
 def search():
     form_search = SearchForm()
-    if request.form.get('submit_search') is not None:
-        if form_search.validate_on_submit():
-            return redirect(url_for('blueprint_report.report',
-                                    query_search=request.form.get('query_search'),
-                                    headhunter=request.form.get('headhunter'),
-                                    stackoverflow=request.form.get('stackoverflow'),
-                                    city=request.form.get('city'),
-                                    state=request.form.get('state'),
-                                    salary=request.form.get('salary')))
+    if form_search.validate_on_submit():
+        return redirect(url_for('blueprint_report.report',
+                                query_search=request.form.get('query_search'),
+                                headhunter=request.form.get('headhunter'),
+                                stackoverflow=request.form.get('stackoverflow'),
+                                city=request.form.get('city'),
+                                state=request.form.get('state'),
+                                salary=request.form.get('salary')))
+    return render_template('search_form.html', 
+                           title='Job search', 
+                           form_search=form_search)
+
+
+@blueprint_search.route('/parsing', methods=['GET', 'POST'])
+@login_required
+def parsing():
     if current_user.is_administrator():
         form_parsing = ParsingForm()
         if form_parsing.validate_on_submit():
-            p = Parsing(request.form.get('headhunter'), 
-                        request.form.get('stackoverflow'), 
+            p = Parsing(request.form.get('headhunter'),
+                        request.form.get('stackoverflow'),
                         request.form.get('query_parsing'))
             p.parsing_vacancies()
-    return render_template('search_form.html', 
-                           title='Job search', 
-                           form_search=form_search, 
-                           form_parsing=form_parsing)
+        return render_template('parsing.html',
+                               title='Job parsing',
+                               form_parsing=form_parsing)
+    else:
+        return redirect(url_for('blueprint_search.search'))
 
 
 @blueprint_search.route('/progress-parsing')
@@ -49,5 +57,4 @@ def progress():
 def stop_parsing():
     Parsing.set_status_thread(False)
     Parsing.update_percentage(0)
-    print('stop')
     return jsonify({'parsing': 'stop'}), 200

@@ -41,6 +41,18 @@ function set_database(id_vacancy, func_param) {
 
 function delete_vacancy(id) {
     id_vacancy = id.toString();
-    set_database(id_vacancy, 'delete');
-    document.location.href = '/vacancies/favorites';
+    $.ajax({
+        type: 'POST',
+        url: '/report/set-status-vacancy',
+        data: JSON.stringify({id: id_vacancy, param: 'delete'}),
+        contentType: 'application/json',
+        success: function(response) {
+            console.log(response.status + ' ' + response.valid);
+            document.location.href = '/vacancies/favorites';
+        },
+        error: function(error) {
+            // console.log(error);
+            console.log(error.status + ' ' + error.valid);
+        }
+    });
 }

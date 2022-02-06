@@ -28,6 +28,11 @@
 
               {% if current_user.is_authenticated %}  
               {% if current_user.is_administrator() %}
+                <li class="nav-item {% block PARSINGPAGE %}{% endblock %}">
+                <a class="nav-link" aria-current="page" href="{{ url_for('blueprint_search.parsing') }}">
+                  Parsing
+                </a>
+                </li>
                 <li class="nav-item {% block VACANCIESPAGE %}{% endblock %}">
                   <a class="nav-link" aria-current="page" href="{{ url_for('blueprint_vacancies.vacancies') }}">
                     Vacancies

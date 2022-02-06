@@ -12,7 +12,7 @@ $('#id_form_parsing').on('submit', function(event) {
     console.log('in function submit parsing');
     event.preventDefault();
     $.ajax({
-        url: '/search/',
+        url: '/search/parsing',
         method: 'POST',
         data: $(this).serialize(),
         beforeSend:function() {

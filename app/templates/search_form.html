@@ -24,7 +24,7 @@
         <div class="mb-3">
             <div class="input-group">
                 {{ form_search.salary(class="form-control", placeholder="Salary") }}
-                <span class="input-group-text">₽</span>
+                <span class="input-group-text">$ € ₽</span>
             </div>
         </div>
 
@@ -57,44 +57,7 @@
     </form>
 </div>
 <br>
-{% if current_user.is_administrator() %}
-<p class="lead">Parsing Panel</p>
-<div class="container col-4 border">    
-    <form id="id_form_parsing" class="align-items-center" method="POST">
-        {{ form_parsing.hidden_tag() }}
-        <div class="mb-3 pt-3">
-            {{ form_parsing.query_parsing(class="form-control", placeholder="Request") }}
-        </div>
 
-        <div class="mb-3 row align-items-center">
-            <div class="custom-control custom-switch col order-first">
-                {{ form_parsing.headhunter(id="check_hh_parsing", class="custom-control-input", type="checkbox", checked="y") }}
-                <label class="custom-control-label", for="check_hh_parsing">HeadHunter</label>
-            </div>
-
-            <div class="custom-control custom-switch col">
-                {{ form_parsing.stackoverflow(id="check_so_parsing", class="custom-control-input", type="checkbox") }}
-                <label class="custom-control-label", for="check_so_parsing">StackOverflow</label>
-            </div>
-
-            <div class="btn-group col order-last">
-                <button type="reset" class="btn btn-outline-secondary">Clear</button>
-                {{ form_parsing.submit_parsing(id="parsing", class="btn btn-outline-secondary") }}
-            </div>
-        </div>
-    </form>
-
-    <div class="progress mb-3" id="process" style="display:none;">
-        <div class="progress">
-            <div class="progress-bar progress-bar-striped active bg-success" role="progressbar" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
-            <span class="progress-bar-label">0%</span>
-        </div>
-    </div>
-</div>
-{% endif %}
 
 {% endblock %}
 
-{% block script %}
-<script src="{{ url_for('static', filename='js/search.js') }}"></script>
-{% endblock %}

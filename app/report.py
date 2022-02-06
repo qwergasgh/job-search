@@ -23,25 +23,34 @@ def report():
     #                         'salary': request.args.get('salary')})
     
     count = Job.query.count()
+    favorite_vacancies = {}
     if count > ROWS_PAGINATOR:
         page = request.args.get('page', 1, type=int)
         jobs = Job.query.paginate(page=page, per_page=ROWS_PAGINATOR)
         title = f'Searching results {page} page'
         paginate = True
+        if jobs is not None:
+            for job in jobs.items:
+                id = job.id
+                favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id,
+                                                            id_vacancy=id).first()
+                if favorite_vacancy is None:
+                    favorite_vacancies[id] = 'add'
+                else:
+                    favorite_vacancies[id] = 'delete'
     else:
         jobs = Job.query.all()
         title = 'Searching results'
         paginate = False
-    favorite_vacancies = {}
-    if len(jobs) > 0:
-        for job in jobs:
-            id = job.id
-            favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id, 
-                                                        id_vacancy=id).first()
-            if favorite_vacancy is None:
-                favorite_vacancies[id] = 'add'
-            else:
-                favorite_vacancies[id] = 'delete'
+        if jobs is not None:
+            for job in jobs:
+                id = job.id
+                favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id,
+                                                            id_vacancy=id).first()
+                if favorite_vacancy is None:
+                    favorite_vacancies[id] = 'add'
+                else:
+                    favorite_vacancies[id] = 'delete'
     parametrs = {'query_search': query_search,
                  'count': count, 
                  'paginate': paginate, 
@@ -60,7 +69,7 @@ def set_status_vacancy():
             param = request.json['param']
             if param == 'add':
                 favorite_vacancy = Favorite(id_user=id_user, 
-                                            id_vacancy=id_vacancy).first()
+                                            id_vacancy=id_vacancy)
                 db.session.add(favorite_vacancy)
             if param == 'delete':
                 favorite_vacancy = Favorite.query.filter_by(id_user=id_user, 
