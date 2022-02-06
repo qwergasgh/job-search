@@ -1,8 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, current_app
 from flask_login.utils import login_required
 from .models import Job, TempJob
 from app import db
-from .views import ROWS_PAGINATOR
 
 
 blueprint_parsing_result = Blueprint('blueprint_parsing_result', 
@@ -15,9 +14,9 @@ blueprint_parsing_result = Blueprint('blueprint_parsing_result',
 @login_required
 def parsing_result():
     count = TempJob.query.count()
-    if count > ROWS_PAGINATOR:
+    if count > current_app.config['ROWS_PAGINATOR']:
         page = request.args.get('page', 1, type=int)
-        temp_jobs = TempJob.query.paginate(page=page, per_page=ROWS_PAGINATOR)
+        temp_jobs = TempJob.query.paginate(page=page, per_page=current_app.config['ROWS_PAGINATOR'])
         title = f'Parsing results {page} page'
         paginate = True
     else:

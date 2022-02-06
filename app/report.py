@@ -1,8 +1,7 @@
-from flask import Blueprint, render_template, request, jsonify
+from flask import Blueprint, render_template, request, jsonify, current_app
 from flask_login.utils import login_required, current_user
 from .models import Job, Favorite
 from app import db
-from .views import ROWS_PAGINATOR
 
 
 blueprint_report = Blueprint('blueprint_report', 
@@ -24,9 +23,9 @@ def report():
     
     count = Job.query.count()
     favorite_vacancies = {}
-    if count > ROWS_PAGINATOR:
+    if count > current_app.config['ROWS_PAGINATOR']:
         page = request.args.get('page', 1, type=int)
-        jobs = Job.query.paginate(page=page, per_page=ROWS_PAGINATOR)
+        jobs = Job.query.paginate(page=page, per_page=current_app.config['ROWS_PAGINATOR'])
         title = f'Searching results {page} page'
         paginate = True
         if jobs is not None:

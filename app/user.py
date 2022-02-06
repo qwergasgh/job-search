@@ -70,8 +70,8 @@ def edit_profile():
 
 @blueprint_user.route('/reset_password', methods=['GET', 'POST'])
 def reset_password():
-    if current_user.is_authenticated:
-        return redirect(url_for('blueprint_app.index'))
+    # if current_user.is_authenticated:
+    #     return redirect(url_for('blueprint_app.index'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -85,8 +85,8 @@ def reset_password():
 
 @blueprint_user.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password_token(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('blueprint_app.index'))
+    # if current_user.is_authenticated:
+    #     return redirect(url_for('blueprint_app.index'))
     user = User.verify_reset_password_token(token)
     if not user:
         return redirect(url_for('blueprint_app.index'))

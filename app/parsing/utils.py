@@ -9,7 +9,6 @@ from sys import platform
 class ParsingProxyParametrs():
     def __init__(self):
         if platform == 'linux':
-            # self.gecko_path = os.path.abspath(os.path.dirname(__file__)) + '/geckodriver'
             self.gecko_path = '/usr/bin/geckodriver'
             self.binary_path = '/usr/bin/firefox'
             self.tor_path = '/usr/bin/tor'
@@ -23,16 +22,11 @@ class ParsingProxyParametrs():
 
     def _create_tor(self):
         try:
-            print('tor start')
             tor = Popen(self.tor_path, shell=True, stdout=PIPE, bufsize=-1)
             if tor.poll() is not None:
                 raise Exception('No connection to tor :^(')
-            result_code = str(tor.stdout.readlines()[-1]).lower()
-            if 'failed' in result_code:
-                print('tor process is already running or port is in use')
-            if 'done' in result_code:
-                print('tor process created')
-            print('tor works')
+            # in logging
+            # result_code = str(tor.stdout.readlines()[-1]).lower()
             return tor
         except:
             return None
@@ -49,7 +43,8 @@ class ParsingProxyParametrs():
     def close_tor(self):
         if self.tor is not None:
             self.tor.kill()
-            print('tor closed\ntor exit code = ' + str(self.tor.poll()))
+            # in logging
+            # result_code = str(self.tor.poll())
 
     def get_parametrs_for_parsing(self):
         return {'options': self.options,

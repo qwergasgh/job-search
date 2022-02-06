@@ -1,8 +1,7 @@
-from flask import Blueprint, render_template, request, redirect, url_for, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, jsonify, current_app
 from flask_login.utils import login_required, current_user
 from app.forms import JobForm
 from app.models import Job, Favorite
-from app.views import ROWS_PAGINATOR
 from app import db
 import os
 
@@ -17,9 +16,9 @@ blueprint_vacancies = Blueprint('blueprint_vacancies',
 @login_required
 def vacancies():
     count = Job.query.count()
-    if count > ROWS_PAGINATOR:
+    if count > current_app.config['ROWS_PAGINATOR']:
         page = request.args.get('page', 1, type=int)
-        jobs = Job.query.paginate(page=page, per_page=ROWS_PAGINATOR)
+        jobs = Job.query.paginate(page=page, per_page=current_app.config['ROWS_PAGINATOR'])
         title = f'Vacancies {page} page'
         paginate = True
     else:
@@ -40,9 +39,9 @@ def favorites():
     for v in vacancies_favorites:
         id_list.append(v.id_vacancy)
     jobs_filter = Job.query.filter(Job.id.in_(id_list))
-    if len(id_list) > ROWS_PAGINATOR:
+    if len(id_list) > current_app.config['ROWS_PAGINATOR']:
         page = request.args.get('page', 1, type=int)
-        jobs = jobs_filter.paginate(page=page, per_page=ROWS_PAGINATOR)
+        jobs = jobs_filter.paginate(page=page, per_page=current_app.config['ROWS_PAGINATOR'])
         title = f'Favorites vacancies {page} page'
         paginate = True
     else:

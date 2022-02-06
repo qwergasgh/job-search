@@ -1,10 +1,9 @@
 from werkzeug.security import generate_password_hash, check_password_hash
-# from flask_msearch import Search
 from flask_login import UserMixin
 from datetime import datetime
 from app import db, login, app
 import jwt
-
+from .elasticsearch_functions import create_index, remove_index, query_index
 
 
 class Job(db.Model):
@@ -109,15 +108,49 @@ def user_loader(user_id):
         return
     return user
 
+
+class ElasticsearchMixin(object):
+    @classmethod
+    def search(cls, expression, page, per_page):
+        ids, total = query_index(cls.__tablename__, expression, page, per_page)
+        if total == 0:
+            return cls.query.filter_by(id=0), 0
+        when = []
+        for i in range(len(ids)):
+            when.append((ids[i], i))
+        return cls.query.filter(cls.id.in_(ids)).order_by(
+            db.case(when, value=cls.id)), total
+
+    @classmethod
+    def before_commit(cls, session):
+        session._changes = {
+            'add': list(session.new),
+            'update': list(session.dirty),
+            'delete': list(session.deleted)
+        }
+
+    @classmethod
+    def after_commit(cls, session):
+        for obj in session._changes['add']:
+            if isinstance(obj, ElasticsearchMixin):
+                create_index(obj.__tablename__, obj)
+        for obj in session._changes['update']:
+            if isinstance(obj, ElasticsearchMixin):
+                create_index(obj.__tablename__, obj)
+        for obj in session._changes['delete']:
+            if isinstance(obj, ElasticsearchMixin):
+                remove_index(obj.__tablename__, obj)
+        session._changes = None
+
+    @classmethod
+    def reindex(cls):
+        for obj in cls.query:
+            create_index(cls.__tablename__, obj)
+
+
+# db.event.listen(db.session, 'before_commit', ElasticsearchMixin.before_commit)
+# db.event.listen(db.session, 'after_commit', ElasticsearchMixin.after_commit)
+
 # @login.unauthorized_handler
 # def unauthorized_handler():
 #    return 'unauthorized'
-
-# from flask_admin import Admin
-# from flask_admin.contrib.sqla import ModelView
-# admin = Admin(app)
-# admin.add_view(ModelView(Job, db.session))
-# admin.add_view(ModelView(TempJob, db.session))
-# admin.add_view(ModelView(Favorite, db.session))
-# admin.add_view(ModelView(Role, db.session))
-# admin.add_view(ModelView(User, db.session))

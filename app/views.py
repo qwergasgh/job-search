@@ -7,7 +7,6 @@ from app import db
 import os
 
 
-ROWS_PAGINATOR = 20
 blueprint_app = Blueprint('blueprint_app', 
                           __name__,
                           template_folder='templates', 
