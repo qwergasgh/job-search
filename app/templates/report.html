@@ -35,8 +35,8 @@
                 <th>Company</th>
                 <th>Salary</th>
                 <th>Location</th>
-                <th>Favorites</th>
                 <th>Link</th>
+                <th>Favorites</th>
             </tr>
             </thead>
             <tbody>
@@ -47,12 +47,13 @@
                 <td>{{ job.company }}</td>
                 <td>{{ job.salary }}</td>
                 <td>{{ job.location }}</td>
+                <td><a class="text-muted" href="{{ job.link }}" target="_blank">Open</a></td>
                 <td><input id="{{job.id}}"
                            type="button" 
                            class="btn btn-outline-secondary"
                            value="{{parametrs.favorite_vacancies[job.id]}}" 
-                           onclick="status_vacancy({{job.id}})"></td>
-                <td><a href="{{ job.link }}" target="_blank">Open</a></td>
+                           onclick="status_vacancy({{job.id}})">
+                </td>
             </tr>
             {% endfor %}
             {% else %}
@@ -62,12 +63,13 @@
                 <td>{{ job.company }}</td>
                 <td>{{ job.salary }}</td>
                 <td>{{ job.location }}</td>
+                <td><a class="text-muted" href="{{ job.link }}" target="_blank">Open</a></td>
                 <td><input id="{{job.id}}" 
                            type="button" 
                            class="btn btn-outline-secondary"
                            value="{{parametrs.favorite_vacancies[job.id]}}" 
-                           onclick="status_vacancy({{job.id}})"></td>
-                <td><a href="{{ job.link }}" target="_blank">Open</a></td>
+                           onclick="status_vacancy({{job.id}})">
+                </td>
             </tr>
             {% endfor %}
             {% endif %}
