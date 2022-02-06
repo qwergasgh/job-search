@@ -16,7 +16,7 @@ def search():
     form_search = SearchForm()
     if request.form.get('submit_search') is not None:
         if form_search.validate_on_submit():
-            return redirect(url_for('blueprint_app.report', 
+            return redirect(url_for('blueprint_report.report',
                                     query_search=request.form.get('query_search'),
                                     headhunter=request.form.get('headhunter'),
                                     stackoverflow=request.form.get('stackoverflow'),
@@ -40,6 +40,7 @@ def search():
 def progress():
     percentage = Parsing.get_percentage()
     if percentage == 100:
+        Parsing.filling_database()
         Parsing.update_percentage(0)
     return jsonify({'percentage': percentage}), 200
 

@@ -64,6 +64,11 @@ def get_fake_useragent():
 
 
 def generate_dict_vacancy(title, company, location, link, salary, source):
+    empty = 'Empty'
+    if company is None:
+        company = empty
+    if location is None:
+        location = empty
     return {'title': title,
             'company': company,
             'location': location,
@@ -75,15 +80,14 @@ def generate_dict_vacancy(title, company, location, link, salary, source):
 def find_salary(salary_result):
     if salary_result is not None:
         salary_result_values = re.findall('[0-9]+', salary_result)
-        print(salary_result_values)
-        print(type(salary_result_values))
-        if type(salary_result_values) == int:
-            return salary_result_values
-        if type(salary_result_values) == list:
-            if len(salary_result_values) > 2:
-                return int(str((int(salary_result_values[0]) + int(salary_result_values[2])) / 2) + '000')
-            if len(salary_result_values) == 2:
-                return int((salary_result_values[0] + '000'))
-            return int(str((int(salary_result_values[0]) + int(salary_result_values[1])) / 2) + '000')
+        if salary_result.find('от') or salary_result.find('до'):
+            return int((salary_result_values[0] + '000'))
+        if len(salary_result_values) > 2:
+            return int((str(int((int(salary_result_values[0]) + int(salary_result_values[2])) / 2)) + '000'))
+        if len(salary_result_values) == 1:
+            return int((salary_result_values[0] + '000'))
+        if len(salary_result_values) == 2:
+            return int((str(int((int(salary_result_values[0]) + int(salary_result_values[1])) / 2)) + '000'))
+        return 0
     else:
-        return None
+        return 0

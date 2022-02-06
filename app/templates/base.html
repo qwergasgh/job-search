@@ -33,6 +33,11 @@
                     Vacancies
                   </a>
                 </li>
+                <li class="nav-item {% block PARSINGRESULTPAGE %}{% endblock %}">
+                  <a class="nav-link" aria-current="page" href="{{ url_for('blueprint_parsing_result.parsing_result') }}">
+                    Parsing result
+                  </a>
+                </li>
               {% endif %}
 
               {% block save %}

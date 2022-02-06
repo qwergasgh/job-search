@@ -33,7 +33,7 @@ $('#id_form_parsing').on('submit', function(event) {
                         document.location.href = '/parsing-result';
                     }
                 });
-            }, 50000);
+            }, 5000);
         },
         error: function(error) {
             console.log(error);

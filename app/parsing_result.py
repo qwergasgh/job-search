@@ -49,6 +49,20 @@ def set_status_parsing_vacancy():
         return jsonify({'valid': 'False'}), 400
 
 
+@blueprint_parsing_result.route('/delete-vacancy', methods=['POST'])
+@login_required
+def delete_vacancy():
+    try:
+        if request.method == 'POST':
+            id_temp_vacancy = int(request.json['id'])
+            temp_job = TempJob.query.filter_by(id=id_temp_vacancy).first()
+            db.session.delete(temp_job)
+            db.session.commit()
+            return jsonify({'valid': 'True'}), 200
+    except:
+        return jsonify({'valid': 'False'}), 400
+
+
 @blueprint_parsing_result.route('/add-parsing-vacancies')
 @login_required
 def add_parsing_vacancies():
@@ -60,7 +74,6 @@ def add_parsing_vacancies():
             temp_jobs = TempJob.query.all()
         if param == 'favorites':
             temp_jobs = TempJob.query.filter_by(status=True)
-        new_jobs = []
         for vacancy in temp_jobs:
             temp_job = Job(title=vacancy.title, 
                            company=vacancy.company, 
@@ -68,10 +81,20 @@ def add_parsing_vacancies():
                            location=vacancy.location, 
                            link=vacancy.link,
                            source=vacancy.source)
-            new_jobs.append(temp_job)
-        db.session.add(new_jobs)
-        db.session.query(TempJob).delete()
+            db.session.add(temp_job)
+            db.session.delete(vacancy)
         db.session.commit()
         return redirect(url_for('blueprint_vacancies.vacancies'))
     except:
         return redirect(url_for('blueprint_parsing_result.parsing_result'))
+
+
+@blueprint_parsing_result.route('/delete-vacancies')
+@login_required
+def delete_vacancies():
+    try:
+        db.session.query(TempJob).delete()
+        db.session.commit()
+        return redirect(url_for('blueprint_parsing_result.parsing_result'))
+    except:
+        return jsonify({'valid': 'False'}), 400

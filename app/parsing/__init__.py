@@ -4,6 +4,7 @@ from app import db
 from selenium.webdriver import Firefox
 from bs4 import BeautifulSoup
 from .utils import generate_dict_vacancy, get_fake_useragent, find_salary, ParsingProxyParametrs
+import time
 
 
 lock = Lock()
@@ -12,18 +13,23 @@ lock = Lock()
 class Parsing():
     percentage = 0
     status_thread = False
+    headhunter = False
+    stackoverflow = False
+    vacancies = []
 
     def __init__(self, headhunter, stackoverflow, query_parsing):
-        self.headhunter = headhunter
-        self.stackoverflow = stackoverflow
+        Parsing.headhunter = headhunter
+        Parsing.stackoverflow = stackoverflow
         self.query_parsing = query_parsing
         self.thread = None
-        self.vacancies = []
         self._create_threading()
 
     @staticmethod
     def update_percentage(percentage):
-        Parsing.percentage = percentage
+        if Parsing.stackoverflow and Parsing.headhunter and percentage!=100:
+            Parsing.percentage = percentage / 2
+        else:
+            Parsing.percentage = percentage
 
     @staticmethod
     def get_percentage():
@@ -44,20 +50,23 @@ class Parsing():
         Parsing.set_status_thread(True)
         self.thread.start()
 
-    def filling_database(self):
+    @staticmethod
+    def filling_database():
         try:
-            for vacancy in self.vacancies:
-                temp_job = TempJob(title=vacancy.title, 
-                                   company=vacancy.company, 
-                                   salary=vacancy.salary, 
-                                   location=vacancy.location, 
-                                   link=vacancy.link,
-                                   source=vacancy.source)
-                db.session.add(temp_job)
+            if len(Parsing.vacancies) > 0:
+                for vacancy in Parsing.vacancies:
+                    temp_job = TempJob(title=vacancy['title'],
+                                       company=vacancy['company'],
+                                       salary=vacancy['salary'],
+                                       location=vacancy['location'],
+                                       link=vacancy['link'],
+                                       source=vacancy['source'])
+                    print(temp_job.title)
+                    db.session.add(temp_job)
                 db.session.commit()
-            return True
+                Parsing.vacancies.clear()
         except:
-            return False
+            return
 
     def _start(self):
         ppp = ParsingProxyParametrs()
@@ -70,23 +79,23 @@ class Parsing():
                             str_page='&page=')
             hh.parsing()
             lock.acquire()
-            self.vacancies.append(hh.get_vacancies())
+            Parsing.vacancies.extend(hh.get_vacancies())
             lock.release()
         if self.stackoverflow == 'y':
             so = StackOverflow(parsing_proxy_parametrs=parsing_proxy_parametrs,
-                            url='https://stackoverflow.com/jobs?q=',
-                            query_parsing=self.query_parsing,
-                            str_page='&&pg=')
+                               url='https://stackoverflow.com/jobs?q=',
+                               query_parsing=self.query_parsing,
+                               str_page='&&pg=')
             so.parsing()
             lock.acquire()
-            self.vacancies.append(so.get_vacancies())
+            Parsing.vacancies.extend(so.get_vacancies())
             lock.release()
         if not Parsing.get_status_thread():
             return
-        lock.acquire()
-        if len(self.vacancies) > 0:
-            self.filling_database()
-        lock.release()
+        # lock.acquire()
+        # if len(self.vacancies) > 0:
+        #     self.filling_database()
+        # lock.release()
 
         # for tests
         # while Parsing.get_percentage() < 100:
@@ -99,10 +108,10 @@ class Parsing():
         #     print(count)
         #     lock.release()
 
-        ppp.close_tor()
         lock.acquire()
-        self.percentage = 100
+        Parsing.update_percentage(100)
         lock.release()
+        ppp.close_tor()
 
 
 class ParsingUtil():
@@ -115,7 +124,6 @@ class ParsingUtil():
         self.vacancies = []
         self._set_fake_useragent()
 
-    # testing !!!
     def _set_fake_useragent(self):
         self.parametrs['options'].set_preference('general.useragent.override',
                                                  get_fake_useragent())
@@ -137,27 +145,23 @@ class ParsingUtil():
                 for page in range(self.max_page):
                     if not Parsing.get_status_thread:
                         return
-                    # number page testing !!!
+                    time.sleep(5)
                     driver.get(url=f'{self.url}{self.query}{self.str_page}{page}')
                     html = driver.page_source
                     if html is not None:
                         self._find_vacancies(html)
                         self._set_fake_useragent()
-                        # testing !!!
                         lock.acquire()
-                        Parsing.update_percentage(int(page))
+                        Parsing.update_percentage(page * 100 / self.max_page)
                         lock.release()
         except:
             lock.acquire()
             Parsing.update_percentage(100)
-            print('error parsing')
+            Parsing.vacancies.clear()
             lock.release()
 
     def get_vacancies(self):
         return self.vacancies
-
-    def percentage(self, number):
-        return number / self.max_page / 2
 
 
 class StackOverflow(ParsingUtil):
@@ -182,11 +186,13 @@ class StackOverflow(ParsingUtil):
         vacancy_id = html['data-jobid']
         link = f'https://stackoverflow.com/jobs/{vacancy_id}/'
         salary_list = html.find_all('li')
+        salary = 0
         for item in salary_list:
-            salary = find_salary(str(item))
-            if salary is None:
+            if str(item).find('title') > -1:
+                find_item = item.text
+                salary = find_salary(find_item)
+            else:
                 continue
-        print(salary)
         source = 'so'
         return generate_dict_vacancy(title, company, location, link, salary, source)
 
@@ -209,11 +215,19 @@ class HeadHunter(ParsingUtil):
     def _create_vacancy(self, html):
         title = html.find('div', {'class': 'vacancy-serp-item__info'}).find('a').text.strip()
         company = html.find('div', {'class': 'vacancy-serp-item__meta-info-company'}).find('a').text.strip()
-        location = html.find('span', {'data-qa': 'vacancy-serp__vacancy-address'})
+        location = html.find('div', {'data-qa': 'vacancy-serp__vacancy-address'})
         if location is not None:
-            location = location.text.strip().partition('и еще')[0]
+            location = location.text.strip()
+            metro = html.find('div', {'class': 'metro-point'})
+            if html.find('div', {'class': 'metro-point'}) is not None:
+                metro.text.strip()
+                location = location + ', ' + metro
+        print(location)
         link = html.find('div', {'class': 'vacancy-serp-item__info'}).find('a')['href'].strip()
-        salary = find_salary(html.find('span', {'class': 'bloko-header-section-3 bloko-header-section-3_lite'}))
-        print(salary)
+        salary_list = html.find('span', {'data-qa': 'vacancy-serp__vacancy-compensation'})
+        if salary_list is None:
+            salary = 0
+        else:
+            salary = find_salary(salary_list.text.strip())
         source = 'hh'
         return generate_dict_vacancy(title, company, location, link, salary, source)

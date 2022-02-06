@@ -11,7 +11,7 @@ $.ajaxSetup({
 
 function status_temp_vacancy(id) {
     id_vacancy = id.toString();
-    if (document.getElementById(id_vacancy).checked == 'y') {
+    if (document.getElementById(id_vacancy).checked != true) {
         document.getElementById(id_vacancy).removeAttribute('checked');
         set_database(id_vacancy, 'n');
     }
@@ -30,6 +30,24 @@ function set_database(id_vacancy, func_param) {
         contentType: 'application/json',
         success: function(response) {
             console.log(response.status + ' ' + response.valid);
+        },
+        error: function(error) {
+            // console.log(error);
+            console.log(error.status + ' ' + error.valid);
+        }
+    });
+}
+
+function delete_vacancy(id_vacancy) {
+    // console.log(id_vacancy, func_param)
+    $.ajax({
+        type: 'POST',
+        url: '/parsing-result/delete-vacancy',
+        data: JSON.stringify({id: id_vacancy}),
+        contentType: 'application/json',
+        success: function(response) {
+            console.log(response.status + ' ' + response.valid);
+            document.location.href = '/parsing-result/';
         },
         error: function(error) {
             // console.log(error);

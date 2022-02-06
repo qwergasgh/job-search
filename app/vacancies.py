@@ -87,11 +87,11 @@ def delete_vacancy():
             if id_vacancy is None:
                 return jsonify({'valid': 'False'}), 400
             vacancy = Job.query.filter_by(id=id_vacancy).first()
-            f_vacancy = Favorite.query.fulter_by(id_vacancy=id_vacancy).first()
+            f_vacancy = Favorite.query.filter_by(id_vacancy=id_vacancy).first()
             db.session.delete(vacancy)
-            db.session.delete(f_vacancy)
+            if f_vacancy is not None:
+                db.session.delete(f_vacancy)
             db.session.commit()
-            # search.update_index(Job)
             return jsonify({'valid': 'True'}), 200
     except:
         return jsonify({'valid': 'False'}), 400
@@ -104,7 +104,6 @@ def delete_vacancies():
         db.session.query(Job).delete()
         db.session.query(Favorite).delete()
         db.session.commit()
-        # search.update_index(Job)
         return redirect(url_for('blueprint_vacancies.vacancies'))
     except:
         return jsonify({'valid': 'False'}), 400

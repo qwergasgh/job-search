@@ -34,7 +34,7 @@ def report():
         paginate = False
     favorite_vacancies = {}
     if len(jobs) > 0:
-        for job in jobs.items:
+        for job in jobs:
             id = job.id
             favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id, 
                                                         id_vacancy=id).first()

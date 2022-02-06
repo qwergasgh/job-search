@@ -58,7 +58,8 @@
                 <td>{{ job.source }}</td>
                 <td><a href="{{ job.link }}" target="_blank">Open</a></td>
                 <td>
-                    <input type="button" 
+                    <input id="{{job.id}}"
+                           type="button"
                            class="btn btn-outline-secondary"
                            value="delete" 
                            onclick="delete_vacancy({{job.id}})">
@@ -75,7 +76,8 @@
                 <td>{{ job.source }}</td>
                 <td><a href="{{ job.link }}" target="_blank">Open</a></td>
                 <td>
-                    <input type="button" 
+                    <input id="{{job.id}}"
+                           type="button"
                            class="btn btn-outline-secondary"
                            value="delete" 
                            onclick="delete_vacancy({{job.id}})">
