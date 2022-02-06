@@ -166,14 +166,12 @@ class ParsingUtil():
 
 class StackOverflow(ParsingUtil):
     def _get_max_page(self, html):
-        # testing not soup !!!
         soup = BeautifulSoup(html, 'html.parser')
         paginator = soup.find('div', {'class': 's-pagination'}).find_all('a')
         max_page = int(paginator[-2].find('span').text)
         return max_page
 
     def _find_vacancies(self, html):
-        # testing not soup !!!
         soup = BeautifulSoup(html, 'html.parser')
         results = soup.find_all('div', {'class': '-job'})
         for result in results:
@@ -198,7 +196,6 @@ class StackOverflow(ParsingUtil):
 
 
 class HeadHunter(ParsingUtil):
-    # testing not soup !!!
     def _get_max_page(self, html):
         soup = BeautifulSoup(html, 'html.parser')
         paginator = soup.find_all('span', {'class': 'pager-item-not-in-short-range'})
@@ -206,7 +203,6 @@ class HeadHunter(ParsingUtil):
         return max_page
 
     def _find_vacancies(self, html):
-        # testing not soup !!!
         soup = BeautifulSoup(html, 'html.parser')
         results = soup.find_all('div', {'class': 'vacancy-serp-item'})
         for result in results:
