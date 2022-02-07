@@ -6,17 +6,6 @@ import jwt
 from .elasticsearch_functions import create_index, remove_index, query_index
 
 
-class Job(db.Model):
-    __tablename__ = 'vacancies'
-    __searchable__ = ['title']
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(80), nullable=False)
-    company = db.Column(db.String(80), nullable=False)
-    location = db.Column(db.String(80), nullable=False)
-    salary = db.Column(db.Integer, nullable=False)
-    link = db.Column(db.String(80), nullable=False)
-    source = db.Column(db.String(80), nullable=False)
-
 
 class TempJob(db.Model):
     __tablename__ = 'temp_vacancies'
@@ -148,8 +137,20 @@ class ElasticsearchMixin(object):
             create_index(cls.__tablename__, obj)
 
 
-# db.event.listen(db.session, 'before_commit', ElasticsearchMixin.before_commit)
-# db.event.listen(db.session, 'after_commit', ElasticsearchMixin.after_commit)
+db.event.listen(db.session, 'before_commit', ElasticsearchMixin.before_commit)
+db.event.listen(db.session, 'after_commit', ElasticsearchMixin.after_commit)
+
+
+class Job(ElasticsearchMixin, db.Model):
+    __tablename__ = 'vacancies'
+    __searchable__ = ['title']
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(80), nullable=False)
+    company = db.Column(db.String(80), nullable=False)
+    location = db.Column(db.String(80), nullable=False)
+    salary = db.Column(db.Integer, nullable=False)
+    link = db.Column(db.String(80), nullable=False)
+    source = db.Column(db.String(80), nullable=False)
 
 # @login.unauthorized_handler
 # def unauthorized_handler():

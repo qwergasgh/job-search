@@ -92,7 +92,7 @@ def reset_password_token(token):
         return redirect(url_for('blueprint_app.index'))
     form = ResetPasswordForm_token()
     if form.validate_on_submit():
-        user.set_password(form.password.data)
+        user.password(form.password.data)
         db.session.commit()
         return redirect(url_for('blueprint_user.login'))
     return render_template('user/reset_password_token.html', form=form)
