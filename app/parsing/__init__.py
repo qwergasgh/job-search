@@ -63,7 +63,6 @@ class Parsing():
                                        state=vacancy['state'],
                                        link=vacancy['link'],
                                        source=vacancy['source'])
-                    print(temp_job.title)
                     db.session.add(temp_job)
                 db.session.commit()
                 Parsing.vacancies.clear()
@@ -184,7 +183,9 @@ class StackOverflow(ParsingUtil):
         company = html.find('h3').find_all('span')[0].text.strip()
         location = html.find('h3').find_all('span')[1].text.strip()
         if location is not 'No office location' or None:
+            lock.acquire()
             city, state = get_location(location)
+            lock.release()
         vacancy_id = html['data-jobid']
         link = f'https://stackoverflow.com/jobs/{vacancy_id}/'
         salary_list = html.find_all('li')
@@ -196,7 +197,6 @@ class StackOverflow(ParsingUtil):
             else:
                 continue
         source = 'so'
-        # return generate_dict_vacancy(title, company, location, link, salary, source)
         return generate_dict_vacancy(title, company, city, state, link, salary, source)
 
 
@@ -223,7 +223,9 @@ class HeadHunter(ParsingUtil):
             # if html.find('div', {'class': 'metro-point'}) is not None:
             #     metro.text.strip()
             #     location = location + ', ' + metro
+            lock.acquire()
             city, state = get_location(location)
+            lock.release()
         link = html.find('div', {'class': 'vacancy-serp-item__info'}).find('a')['href'].strip()
         salary_list = html.find('span', {'data-qa': 'vacancy-serp__vacancy-compensation'})
         if salary_list is None:
@@ -231,5 +233,4 @@ class HeadHunter(ParsingUtil):
         else:
             salary = find_salary(salary_list.text.strip())
         source = 'hh'
-        # return generate_dict_vacancy(title, company, location, link, salary, source)
         return generate_dict_vacancy(title, company, city, state, link, salary, source)
