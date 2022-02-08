@@ -3,7 +3,7 @@ from app.models import TempJob
 from app import db
 from selenium.webdriver import Firefox
 from bs4 import BeautifulSoup
-from .utils import generate_dict_vacancy, get_fake_useragent, find_salary, ParsingProxyParametrs
+from .utils import generate_dict_vacancy, get_fake_useragent, find_salary, get_location, ParsingProxyParametrs
 import time
 
 
@@ -58,7 +58,9 @@ class Parsing():
                     temp_job = TempJob(title=vacancy['title'],
                                        company=vacancy['company'],
                                        salary=vacancy['salary'],
-                                       location=vacancy['location'],
+                                       # location=vacancy['location'],
+                                       city=vacancy['city'],
+                                       state=vacancy['state'],
                                        link=vacancy['link'],
                                        source=vacancy['source'])
                     print(temp_job.title)
@@ -181,6 +183,8 @@ class StackOverflow(ParsingUtil):
         title = html.find('h2').find('a').text.strip()
         company = html.find('h3').find_all('span')[0].text.strip()
         location = html.find('h3').find_all('span')[1].text.strip()
+        if location is not 'No office location' or None:
+            city, state = get_location(location)
         vacancy_id = html['data-jobid']
         link = f'https://stackoverflow.com/jobs/{vacancy_id}/'
         salary_list = html.find_all('li')
@@ -192,7 +196,8 @@ class StackOverflow(ParsingUtil):
             else:
                 continue
         source = 'so'
-        return generate_dict_vacancy(title, company, location, link, salary, source)
+        # return generate_dict_vacancy(title, company, location, link, salary, source)
+        return generate_dict_vacancy(title, company, city, state, link, salary, source)
 
 
 class HeadHunter(ParsingUtil):
@@ -214,11 +219,11 @@ class HeadHunter(ParsingUtil):
         location = html.find('div', {'data-qa': 'vacancy-serp__vacancy-address'})
         if location is not None:
             location = location.text.strip()
-            metro = html.find('div', {'class': 'metro-point'})
-            if html.find('div', {'class': 'metro-point'}) is not None:
-                metro.text.strip()
-                location = location + ', ' + metro
-        print(location)
+            # metro = html.find('div', {'class': 'metro-point'})
+            # if html.find('div', {'class': 'metro-point'}) is not None:
+            #     metro.text.strip()
+            #     location = location + ', ' + metro
+            city, state = get_location(location)
         link = html.find('div', {'class': 'vacancy-serp-item__info'}).find('a')['href'].strip()
         salary_list = html.find('span', {'data-qa': 'vacancy-serp__vacancy-compensation'})
         if salary_list is None:
@@ -226,4 +231,5 @@ class HeadHunter(ParsingUtil):
         else:
             salary = find_salary(salary_list.text.strip())
         source = 'hh'
-        return generate_dict_vacancy(title, company, location, link, salary, source)
+        # return generate_dict_vacancy(title, company, location, link, salary, source)
+        return generate_dict_vacancy(title, company, city, state, link, salary, source)

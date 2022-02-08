@@ -15,6 +15,6 @@ class BaseConfig:
     MAIL_USE_SSL = True
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-    ELASTICSEARCH_URL = {"hosts": ["127.0.0.1:9200"]}
+    # ELASTICSEARCH_URL = {"hosts": ["127.0.0.1:9200"]}
     ADMINS = ['admin@mail.com']
     ROWS_PAGINATOR = 20

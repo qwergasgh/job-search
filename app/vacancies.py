@@ -61,13 +61,17 @@ def add_vacancy():
         title_vacancy= request.form.get('title')
         company = request.form.get('company')
         salary = request.form.get('salary')
-        location = request.form.get('location')
+        # location = request.form.get('location')
+        city = request.form.get('city')
+        state = request.form.get('state')
         source = request.form.get('source')
         link = request.form.get('link')
         new_vacancy = Job(title=title_vacancy, 
                           company=company,
                           salary=salary,
-                          location=location,
+                          # location=location,
+                          city=city,
+                          state=state,
                           source=source,
                           link=link)
         db.session.add(new_vacancy)

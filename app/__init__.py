@@ -4,7 +4,7 @@ from flask_login import LoginManager
 from config import BaseConfig
 from flask import Flask
 from flask_mail import Mail
-from elasticsearch import Elasticsearch
+# from elasticsearch import Elasticsearch
 
 
 app = Flask(__name__)
@@ -20,7 +20,7 @@ with app.app_context():
 
 mail = Mail(app)
 
-app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']])
+# app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']])
 
 login = LoginManager(app)
 login.session_protection = 'strong'

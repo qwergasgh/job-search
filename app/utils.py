@@ -14,10 +14,14 @@ def save_to_csv(vacancies, file):
     try:
         with open(file, mode='w', encoding='utf-8') as file:
             writer = csv.writer(file)
-            writer.writerow(['Title', 'Company', 'Salary', 'Location', 'Link'])
+            # writer.writerow(['Title', 'Company', 'Salary', 'Location', 'Link'])
+            # for vacancy in vacancies:
+            #     writer.writerow([vacancy.title, vacancy.company, vacancy.salary, 
+            #                     vacancy.location, vacancy.link])
+            writer.writerow(['Title', 'Company', 'Salary', 'City', 'State', 'Link'])
             for vacancy in vacancies:
                 writer.writerow([vacancy.title, vacancy.company, vacancy.salary, 
-                                vacancy.location, vacancy.link])
+                                vacancy.city, vacancy.state, vacancy.link])
         return True
     except:
         return False
@@ -34,7 +38,13 @@ def clear_tmp(user_name):
 
 
 def get_jobs(query_parametrs):
-    jobs_filter = Job.query.whoosh_search(query_parametrs.query).all()
+    jobs_filter = Job.query.all()
+    if query_parametrs.city is not None:
+        pass
+    if query_parametrs.state is not None:
+        pass
+    if query_parametrs.salary is not None:
+        jobs_filter = jobs_filter.filter(query_parametrs.salary >= Job.salary).all()
     for job in jobs_filter:
         print(job.title)
     if query_parametrs.headhunter:

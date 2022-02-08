@@ -77,7 +77,9 @@ def add_parsing_vacancies():
             temp_job = Job(title=vacancy.title, 
                            company=vacancy.company, 
                            salary=vacancy.salary, 
-                           location=vacancy.location, 
+                           # location=vacancy.location, 
+                           city=vacancy.city, 
+                           state=vacancy.state, 
                            link=vacancy.link,
                            source=vacancy.source)
             db.session.add(temp_job)
