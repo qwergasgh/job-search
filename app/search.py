@@ -33,7 +33,7 @@ def parsing():
         if form_parsing.validate_on_submit():
             p = Parsing(request.form.get('headhunter'),
                         request.form.get('stackoverflow'),
-                        request.form.get('query_parsing'))
+                        request.form.get('query_parsing').strip())
             p.parsing_vacancies()
         return render_template('parsing.html',
                                title='Job parsing',

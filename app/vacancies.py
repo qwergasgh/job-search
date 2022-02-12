@@ -31,6 +31,7 @@ def vacancies():
     return render_template('vacancies/vacancies.html', parametrs=parametrs, title=title)
 
 
+# add new query
 @blueprint_vacancies.route('/favorites', methods=['GET', 'POST'])
 @login_required
 def favorites():

@@ -6,7 +6,6 @@ from flask import Flask
 from flask_mail import Mail
 import flask_whooshalchemy3 as whooshalchemy
 
-# from elasticsearch import Elasticsearch
 
 
 app = Flask(__name__)
@@ -21,8 +20,6 @@ with app.app_context():
     db.create_all()
 
 mail = Mail(app)
-
-# app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']])
 
 login = LoginManager(app)
 login.session_protection = 'strong'

@@ -16,53 +16,14 @@ blueprint_report = Blueprint('blueprint_report',
 def report():
     query_search = request.args.get('query_search')
     jobs_filter = get_jobs(dict(query=query_search,
-                                headhunter=request.args.get('headhunter'),
-                                stackoverflow=request.args.get('stackoverflow'),
                                 city=request.args.get('city'),
                                 state=request.args.get('state'),
                                 salary=request.args.get('salary')))
-    
-    # count = Job.query.count()
-    # favorite_vacancies = {}
-    # if count > current_app.config['ROWS_PAGINATOR']:
-    #     page = request.args.get('page', 1, type=int)
-    #     jobs = Job.query.paginate(page=page, per_page=current_app.config['ROWS_PAGINATOR'])
-    #     title = f'Searching results {page} page'
-    #     paginate = True
-    #     if jobs is not None:
-    #         for job in jobs.items:
-    #             id = job.id
-    #             favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id,
-    #                                                         id_vacancy=id).first()
-    #             if favorite_vacancy is None:
-    #                 favorite_vacancies[id] = 'add'
-    #             else:
-    #                 favorite_vacancies[id] = 'delete'
-    # else:
-    #     jobs = Job.query.all()
-    #     title = 'Searching results'
-    #     paginate = False
-    #     if jobs is not None:
-    #         for job in jobs:
-    #             id = job.id
-    #             favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id,
-    #                                                         id_vacancy=id).first()
-    #             if favorite_vacancy is None:
-    #                 favorite_vacancies[id] = 'add'
-    #             else:
-    #                 favorite_vacancies[id] = 'delete'
-    # parametrs = {'query_search': query_search,
-    #              'count': count, 
-    #              'paginate': paginate, 
-    #              'jobs': jobs, 
-    #              'favorite_vacancies': favorite_vacancies}
-    # return render_template('report.html', parametrs=parametrs, title=title)
-
-    count = jobs_filter.query.count()
+    count = jobs_filter.count()
     favorite_vacancies = {}
     if count > current_app.config['ROWS_PAGINATOR']:
         page = request.args.get('page', 1, type=int)
-        jobs = jobs_filter.query.paginate(page=page, per_page=current_app.config['ROWS_PAGINATOR'])
+        jobs = jobs_filter.paginate(page=page, per_page=current_app.config['ROWS_PAGINATOR'])
         title = f'Searching results {page} page'
         paginate = True
         if jobs is not None:
@@ -75,7 +36,7 @@ def report():
                 else:
                     favorite_vacancies[id] = 'delete'
     else:
-        jobs = jobs_filter.query.all()
+        jobs = jobs_filter
         title = 'Searching results'
         paginate = False
         if jobs is not None:

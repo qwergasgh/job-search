@@ -1,12 +1,11 @@
-from threading import Thread
-import csv
-from .models import Job
-from app import db
-import os
-from flask_mail import Message
-from app import mail
 from flask import render_template
-from app import app
+from flask_mail import Message
+from app import db, mail, app
+from threading import Thread
+from sqlalchemy import and_
+from .models import Job
+import csv
+import os
 
 
 
@@ -14,10 +13,6 @@ def save_to_csv(vacancies, file):
     try:
         with open(file, mode='w', encoding='utf-8') as file:
             writer = csv.writer(file)
-            # writer.writerow(['Title', 'Company', 'Salary', 'Location', 'Link'])
-            # for vacancy in vacancies:
-            #     writer.writerow([vacancy.title, vacancy.company, vacancy.salary, 
-            #                     vacancy.location, vacancy.link])
             writer.writerow(['Title', 'Company', 'Salary', 'City', 'State', 'Link'])
             for vacancy in vacancies:
                 writer.writerow([vacancy.title, vacancy.company, vacancy.salary, 
@@ -38,14 +33,16 @@ def clear_tmp(user_name):
 
 
 def get_jobs(query_parametrs):
-    jobs_filter = Job.query.search(query_parametrs['query']).all()
-    if query_parametrs['city'] is not None:
-        jobs_filter = jobs_filter.filter(Job.city == query_parametrs['city']).all()
-    if query_parametrs['state'] is not None:
-        jobs_filter = jobs_filter.filter(Job.state == query_parametrs['state']).all()
-    if query_parametrs['salary'] is not None:
-        jobs_filter = jobs_filter.filter(Job.salary >= query_parametrs['salary']).all()
-    return jobs_filter
+    if query_parametrs['salary'] == '':
+        salary = 0
+    else:
+        salary = query_parametrs['salary']
+    jobs_filter = Job.query.search(query_parametrs['query']).filter(Job.salary >= salary)
+    if query_parametrs['city'].strip() != '':
+        jobs_filter = jobs_filter.filter(Job.city == query_parametrs['city'])
+    if query_parametrs['state'] != '':
+        jobs_filter = jobs_filter.filter(Job.state == query_parametrs['state'])
+    return jobs_filter.order_by(Job.id.desc())
 
 
 def send_email(subject, sender, recipients, text_body, html_body):

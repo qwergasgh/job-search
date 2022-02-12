@@ -9,9 +9,6 @@ class LoginForm(FlaskForm):
                                             Length(1, 64),
                                             Email()])
     password = PasswordField('Password', validators=[DataRequired()])
-    # first_name = StringField('First name', validators=[DataRequired()])
-    # last_name = StringField('Last name', validators=[DataRequired()])
-    # phonenumber = IntegerField('Phonenumber', validators=[DataRequired()])
     submit = SubmitField('Login')
 
     def __init__(self, *args, **kwargs):
@@ -73,11 +70,9 @@ class RegisterForm(FlaskForm):
 
 class SearchForm(FlaskForm):
     query_search = StringField('Query search', validators=[DataRequired(), Length(min=1, max=100)])
-    city = StringField('City', validators=[DataRequired()])
-    state = StringField('State', validators=[DataRequired()])
-    salary = IntegerField('Salary', validators=[DataRequired()])
-    # headhunter = BooleanField('HeadHunter')
-    # stackoverflow = BooleanField('StackOverFlow')
+    city = StringField('City')
+    state = StringField('State')
+    salary = IntegerField('Salary')
     submit_search = SubmitField('Search')
 
     def __init__(self, *args, **kwargs):
@@ -86,8 +81,6 @@ class SearchForm(FlaskForm):
     def validate(self):
         if self.query_search.data.strip() == "":
             return False
-        # if self.headhunter.data is False and self.stackoverflow.data is False:
-        #     return False
         return True
 
 class ParsingForm(FlaskForm):
@@ -118,21 +111,16 @@ class EditProfileForm(FlaskForm):
                               validators=[DataRequired(), 
                               Length(min=10, max=12),
                               Regexp('[0-9]', 0, 'Phonenumber must have only numbers')])
-    # password = PasswordField('Password',
-    #         validators=[DataRequired(), Length(min=8, max=64)])
-    # confirm = PasswordField('Verify password',
-    #         validators=[DataRequired(), EqualTo('password',
-    #         message='Passwords must match')])
     submit = SubmitField('Save')
 
     def __init__(self, *args, **kwargs):
         super(EditProfileForm, self).__init__(*args, **kwargs)
 
+# add validate source, link
 class JobForm(FlaskForm):
     title = StringField('Title', validators=[DataRequired()])
     company = StringField('Company', validators=[DataRequired()])
     salary = IntegerField('Salary', validators=[DataRequired(message="Only numbers")])
-    # location = StringField('Location', validators=[DataRequired()])
     city = StringField('City', validators=[DataRequired()])
     state = StringField('State', validators=[DataRequired()])
     source = StringField('Source', validators=[DataRequired()])
@@ -141,13 +129,6 @@ class JobForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super(JobForm, self).__init__(*args, **kwargs)
-
-    # def validate(self):
-    #     if self.query_search.data.strip() == "":
-    #         return False
-    #     if self.headhunter.data is False and self.stackoverflow.data is False:
-    #         return False
-    #     return True
 
 
 class ResetPasswordForm(FlaskForm):

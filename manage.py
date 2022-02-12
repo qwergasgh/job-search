@@ -1,5 +1,5 @@
-from flask_migrate import Migrate, MigrateCommand
 from app.models import Job, Favorite, User, Role, TempJob
+from flask_migrate import Migrate, MigrateCommand
 from flask_script import Manager, Shell
 from app import app, db
 

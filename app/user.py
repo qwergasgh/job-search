@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for, abort
-from flask_login.utils import login_required, login_user, logout_user, current_user
 from .forms import LoginForm, EditProfileForm, ResetPasswordForm, ResetPasswordForm_token
-from .models import User
+from flask_login.utils import login_required, login_user, logout_user, current_user
+from flask import Blueprint, render_template, request, redirect, url_for, abort
 from .utils import clear_tmp, send_password_reset_email
+from .models import User
 from app import db
 
 
@@ -51,8 +51,6 @@ def edit_profile():
         current_user.first_name = form.first_name.data
         current_user.last_name = form.last_name.data
         current_user.phonenumber = form.phonenumber.data
-        # current_user.password = form.password.data
-        # user = User.query.filter_by(user_name=name).first()
         db.session.add(current_user)
         db.session.commit()
         return redirect(url_for('blueprint_user.edit_profile'))
@@ -61,7 +59,6 @@ def edit_profile():
     form.first_name.data = current_user.first_name
     form.last_name.data = current_user.last_name
     form.phonenumber.data = current_user.phonenumber
-    # form.password.data = current_user.password
     return render_template('user/edit_profile.html', 
                            title="Edit profile", 
                            form=form, 
@@ -70,8 +67,6 @@ def edit_profile():
 
 @blueprint_user.route('/reset_password', methods=['GET', 'POST'])
 def reset_password():
-    # if current_user.is_authenticated:
-    #     return redirect(url_for('blueprint_app.index'))
     form = ResetPasswordForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
@@ -85,8 +80,6 @@ def reset_password():
 
 @blueprint_user.route('/reset_password/<token>', methods=['GET', 'POST'])
 def reset_password_token(token):
-    # if current_user.is_authenticated:
-    #     return redirect(url_for('blueprint_app.index'))
     user = User.verify_reset_password_token(token)
     if not user:
         return redirect(url_for('blueprint_app.index'))

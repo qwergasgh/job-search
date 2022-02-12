@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, send_file, url_for
 from flask_login.utils import login_required, current_user
-from .forms import RegisterForm
 from .models import Job, User, Favorite
+from .forms import RegisterForm
 from .utils import save_to_csv
 from app import db
 import os
