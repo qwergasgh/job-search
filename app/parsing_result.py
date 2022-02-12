@@ -37,10 +37,7 @@ def set_status_parsing_vacancy():
             id_temp_vacancy = int(request.json['id'])
             param = request.json['param']
             temp_job = TempJob.query.filter_by(id=id_temp_vacancy).first()
-            if param == 'y':
-                temp_job.status = True
-            if param == 'n':
-                temp_job.status = False
+            temp_job.status = True if param == 'y' else False
             db.session.add(temp_job)
             db.session.commit()
             return jsonify({'valid': 'True'}), 200
@@ -62,6 +59,7 @@ def delete_vacancy():
         return jsonify({'valid': 'False'}), 400
 
 
+# add param search jobs
 @blueprint_parsing_result.route('/add-parsing-vacancies')
 @login_required
 def add_parsing_vacancies():

@@ -1,12 +1,13 @@
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
+from geopy.geocoders import Nominatim
 from subprocess import Popen, PIPE
+# from translate import Translator
+# from langdetect import detect
 import fake_useragent
 import re
-from sys import platform
-from translate import Translator
-from langdetect import detect
-from geopy.geocoders import Nominatim
+
+
 
 
 
@@ -20,14 +21,6 @@ class ParsingProxyParametrs():
         self.gecko_path = '/usr/bin/geckodriver'
         self.binary_path = '/usr/bin/firefox'
         self.tor_path = '/usr/bin/tor'
-        # if platform == 'linux':
-        #     self.gecko_path = '/usr/bin/geckodriver'
-        #     self.binary_path = '/usr/bin/firefox'
-        #     self.tor_path = '/usr/bin/tor'
-        # if platform.index('win') > -1:
-        #     self.gecko_path = r'C:\Program Files\Mozilla Firefox\geckodriver.exe'
-        #     self.binary_path = r'C:\Program Files\Mozilla Firefox\firefox.exe'
-        #     self.tor_path = r'C:\Program Files\TorBrowser\Bundle\Tor\tor.exe'
         self.tor = self._create_tor()
         self.options = self._create_options()
         self.service = Service(executable_path=self.gecko_path)
@@ -91,13 +84,16 @@ def find_salary(salary_result):
         salary_result_values = re.findall('[0-9]+', salary_result)
         if salary_result.find('от') or salary_result.find('до'):
             return int((salary_result_values[0] + '000'))
-        if len(salary_result_values) > 2:
-            return int((str(int((int(salary_result_values[0]) + int(salary_result_values[2])) / 2)) + '000'))
-        if len(salary_result_values) == 1:
+        elif len(salary_result_values) > 2:
+            return int((str(int((int(salary_result_values[0]) + \
+                   int(salary_result_values[2])) / 2)) + '000'))
+        elif len(salary_result_values) == 1:
             return int((salary_result_values[0] + '000'))
-        if len(salary_result_values) == 2:
-            return int((str(int((int(salary_result_values[0]) + int(salary_result_values[1])) / 2)) + '000'))
-        return 0
+        elif len(salary_result_values) == 2:
+            return int((str(int((int(salary_result_values[0]) + \
+                   int(salary_result_values[1])) / 2)) + '000'))
+        else:
+            return 0
     else:
         return 0
 

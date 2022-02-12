@@ -1,5 +1,5 @@
 <div align="right">
-    <a href="{{ url_for('blueprint_report.report', page=parametrs.jobs.prev_num) }}"
+    <a href="{{ url_for('blueprint_report.report', query_search=parametrs.query_search, city=parametrs.city, state=parametrs.state, salary=parametrs.salary, page=parametrs.jobs.prev_num) }}"
     class="btn btn-outline-secondary 
     {% if parametrs.jobs.page == 1 %}disabled{% endif %}">
         &laquo;
@@ -7,12 +7,12 @@
     {% for page_num in parametrs.jobs.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
         {% if page_num %}
             {% if parametrs.jobs.page == page_num %}
-                <a href="{{ url_for('blueprint_report.report', page=page_num) }}"
+                <a href="{{ url_for('blueprint_report.report', query_search=parametrs.query_search, city=parametrs.city, state=parametrs.state, salary=parametrs.salary, page=page_num) }}"
                 class="btn btn-outline-secondary">
                     {{ page_num }}
                 </a>
                 {% else %}
-                <a href="{{ url_for('blueprint_report.report', page=page_num) }}"
+                <a href="{{ url_for('blueprint_report.report', query_search=parametrs.query_search, city=parametrs.city, state=parametrs.state, salary=parametrs.salary, page=page_num) }}"
                 class="btn btn-outline-secondary">
                     {{ page_num }}
                 </a>
@@ -21,7 +21,7 @@
                 ...
         {% endif %}
     {% endfor %}    
-    <a href="{{ url_for('blueprint_report.report', page=parametrs.jobs.next_num) }}"
+    <a href="{{ url_for('blueprint_report.report', query_search=parametrs.query_search, city=parametrs.city, state=parametrs.state, salary=parametrs.salary, page=parametrs.jobs.next_num) }}"
     class="btn btn-outline-secondary
     {% if parametrs.jobs.page == parametrs.jobs.pages %}disabled{% endif %}">
         &raquo;

@@ -1,10 +1,10 @@
+from flask_whooshalchemy3 import search_index
 from flask_sqlalchemy import SQLAlchemy
 from flask_wtf.csrf import CSRFProtect
 from flask_login import LoginManager
 from config import BaseConfig
 from flask import Flask
 from flask_mail import Mail
-import flask_whooshalchemy3 as whooshalchemy
 
 
 
@@ -41,7 +41,7 @@ app.register_blueprint(blueprint_search, url_prefix="/search")
 app.register_blueprint(blueprint_report, url_prefix="/report")
 
 from .models import Job
-whooshalchemy.search_index(app, Job)
+search_index(app, Job)
 
 login.login_view = 'blueprint_user.login'
 

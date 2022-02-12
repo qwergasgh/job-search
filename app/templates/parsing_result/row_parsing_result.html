@@ -1,0 +1,24 @@
+<tr>
+    <td>{{ job.title }}</td>
+    <td>{{ job.company }}</td>
+    <td>{{ job.salary }}</td>
+    <td>{{ job.city }}</td>
+    <td>{{ job.state }}</td>
+    <td><a class="text-muted" href="{{ job.link }}" target="_blank">Open</a></td>
+    <td>
+    <div class="custom-control custom-switch">
+        <input id="{{job.id}}"
+            class="form-check-input"
+            type="checkbox" 
+            {% if job.status %}checked="y"{% endif %}
+            onclick="status_temp_vacancy({{job.id}})">
+        <label class="custom-control-label" for="{{job.id}}">Favorite</label>
+    </div>
+    </td>
+    <td>
+    <input type="button"
+        class="btn btn-outline-secondary"
+        value="delete"
+        onclick="delete_vacancy({{job.id}})">
+    </td>
+</tr>

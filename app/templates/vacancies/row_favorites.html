@@ -1,0 +1,15 @@
+<tr>
+    <td>{{ job.title }}</td>
+    <td>{{ job.company }}</td>
+    <td>{{ job.salary }}</td>
+    <td>{{ job.city }}</td>
+    <td>{{ job.state }}</td>
+    <td><a href="{{ job.link }}" target="_blank">Open</a></td>
+    <td>
+        <input id="{{job.id}}"
+               type="button"
+               class="btn btn-outline-secondary"
+               value="delete"
+               onclick="delete_vacancy({{job.id}})">
+    </td>
+</tr>

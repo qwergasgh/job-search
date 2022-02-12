@@ -1,7 +1,7 @@
 import os
 
 app_dir = os.path.abspath(os.path.dirname(__file__))
-base_dir = os.path.join(app_dir + '/app/db_app.db')
+base_dir = os.path.join(app_dir, 'app/db_app.db')
 
 # add deploy config
 class BaseConfig:
@@ -19,7 +19,7 @@ class BaseConfig:
     # pginate
     ROWS_PAGINATOR = 20
     # db
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app_dir + '/app/db_app.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + base_dir
     SQLALCHEMY_TRACK_MODIFICATIONS = True
     QSLALCHEMY_COMMIT_ON_TEARDOWN = True
     # db whoosh

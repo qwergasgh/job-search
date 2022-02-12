@@ -47,16 +47,15 @@ def export():
             name = 'vacancies'
         if type == 'favorites':
             vacancies_favorites = Favorite.query.filter_by(id_user=current_user.id)
-            id_list = []
-            for v in vacancies_favorites:
-                id_list.append(v.id_vacancy)
+            id_list = [v.id_vacancy for v in vacancies_favorites]
             if len(id_list) == 0:
                 return redirect(url_for('blueprint_vacancies.favorites'))
-            vacancies = Job.query.filter(Job.id.in_(id_list))
+            vacancies = Job.query.filter(Job.id.in_(id_list)).all()
             name = 'favorites_vacancies'
         if vacancies is None:
             raise Exception()
-        file = os.path.abspath(os.path.dirname(__file__)) + f'/tmp/{name}_for_{current_user.user_name}.csv'
+        file = os.path.join(os.path.abspath(os.path.dirname(__file__)), \
+               f'/tmp/{name}_for_{current_user.user_name}.csv')
         if save_to_csv(vacancies, file):
             return send_file(file)
         else:

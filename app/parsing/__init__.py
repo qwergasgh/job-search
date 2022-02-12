@@ -1,9 +1,9 @@
+from .utils import generate_dict_vacancy, get_fake_useragent, find_salary, get_location, ParsingProxyParametrs
+from selenium.webdriver import Firefox
 from threading import Thread, Lock
 from app.models import TempJob
-from app import db
-from selenium.webdriver import Firefox
 from bs4 import BeautifulSoup
-from .utils import generate_dict_vacancy, get_fake_useragent, find_salary, get_location, ParsingProxyParametrs
+from app import db
 import time
 
 
@@ -26,8 +26,8 @@ class Parsing():
 
     @staticmethod
     def update_percentage(percentage):
-        if Parsing.stackoverflow and Parsing.headhunter and percentage!=100:
-            Parsing.percentage = percentage / 2
+        if Parsing.stackoverflow and Parsing.headhunter and percentage != 100:
+            Parsing.percentage = percentage // 2
         else:
             Parsing.percentage = percentage
 
@@ -91,22 +91,6 @@ class Parsing():
             lock.release()
         if not Parsing.get_status_thread():
             return
-        # lock.acquire()
-        # if len(self.vacancies) > 0:
-        #     self.filling_database()
-        # lock.release()
-
-        # for tests
-        # while Parsing.get_percentage() < 100:
-        #     if not Parsing.get_status_thread():
-        #         return
-        #     # time.sleep(2)
-        #     count = Parsing.get_percentage() + 1
-        #     lock.acquire()
-        #     Parsing.update_percentage(count)
-        #     print(count)
-        #     lock.release()
-
         lock.acquire()
         Parsing.update_percentage(100)
         lock.release()
@@ -151,7 +135,7 @@ class ParsingUtil():
                         self._find_vacancies(html)
                         self._set_fake_useragent()
                         lock.acquire()
-                        Parsing.update_percentage(page * 100 / self.max_page)
+                        Parsing.update_percentage(page * 100 // self.max_page)
                         lock.release()
         except:
             lock.acquire()
@@ -172,8 +156,7 @@ class StackOverflow(ParsingUtil):
     def _find_vacancies(self, html):
         soup = BeautifulSoup(html, 'html.parser')
         results = soup.find_all('div', {'class': '-job'})
-        for result in results:
-            self.vacancies.append(self._create_vacancy(result))
+        self.vacancies = [self._create_vacancy(result) for result in results]
 
     def _create_vacancy(self, html):
         title = html.find('h2').find('a').text.strip()
@@ -207,8 +190,7 @@ class HeadHunter(ParsingUtil):
     def _find_vacancies(self, html):
         soup = BeautifulSoup(html, 'html.parser')
         results = soup.find_all('div', {'class': 'vacancy-serp-item'})
-        for result in results:
-            self.vacancies.append(self._create_vacancy(result))
+        self.vacancies = [self._create_vacancy(result) for result in results]
 
     def _create_vacancy(self, html):
         title = html.find('div', {'class': 'vacancy-serp-item__info'}).find('a').text.strip()
@@ -216,18 +198,11 @@ class HeadHunter(ParsingUtil):
         location = html.find('div', {'data-qa': 'vacancy-serp__vacancy-address'})
         if location is not None:
             location = location.text.strip()
-            # metro = html.find('div', {'class': 'metro-point'})
-            # if html.find('div', {'class': 'metro-point'}) is not None:
-            #     metro.text.strip()
-            #     location = location + ', ' + metro
             lock.acquire()
             city, state = get_location(location)
             lock.release()
         link = html.find('div', {'class': 'vacancy-serp-item__info'}).find('a')['href'].strip()
         salary_list = html.find('span', {'data-qa': 'vacancy-serp__vacancy-compensation'})
-        if salary_list is None:
-            salary = 0
-        else:
-            salary = find_salary(salary_list.text.strip())
+        salary = 0 if salary_list is None else find_salary(salary_list.text.strip())
         source = 'hh'
         return generate_dict_vacancy(title, company, city, state, link, salary, source)

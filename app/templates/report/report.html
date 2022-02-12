@@ -5,7 +5,7 @@
 
 {% block save %}
     <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('blueprint_app.export', vacancies=all) }}">
+        <a class="nav-link" href="{{ url_for('blueprint_app.export', vacancies='all') }}">
             <img src="{{ url_for('static', filename='img/csv.png') }}" alt="Save all to CSV" vspace="0" align="center" height="25px">
         </a>
     </li>
@@ -34,7 +34,6 @@
                 <th>Title</th>
                 <th>Company</th>
                 <th>Salary</th>
-                <!--<th>Location</th>-->
                 <th>City</th>
                 <th>State</th>
                 <th>Link</th>
@@ -44,44 +43,16 @@
             <tbody>
             {% if parametrs.paginate %}
             {% for job in parametrs.jobs.items %}
-            <tr>
-                <td>{{ job.title }}</td>
-                <td>{{ job.company }}</td>
-                <td>{{ job.salary }}</td>
-                <!--<td>{{ job.location }}</td>-->
-                <td>{{ job.city }}</td>
-                <td>{{ job.state }}</td>
-                <td><a class="text-muted" href="{{ job.link }}" target="_blank">Open</a></td>
-                <td><input id="{{job.id}}"
-                           type="button" 
-                           class="btn btn-outline-secondary"
-                           value="{{parametrs.favorite_vacancies[job.id]}}" 
-                           onclick="status_vacancy({{job.id}})">
-                </td>
-            </tr>
+            {% include 'report/row_report.html' %}
             {% endfor %}
             {% else %}
             {% for job in parametrs.jobs %}
-            <tr>
-                <td>{{ job.title }}</td>
-                <td>{{ job.company }}</td>
-                <td>{{ job.salary }}</td>
-                <!--<td>{{ job.location }}</td>-->
-                <td>{{ job.city }}</td>
-                <td>{{ job.state }}</td>
-                <td><a class="text-muted" href="{{ job.link }}" target="_blank">Open</a></td>
-                <td><input id="{{job.id}}" 
-                           type="button" 
-                           class="btn btn-outline-secondary"
-                           value="{{parametrs.favorite_vacancies[job.id]}}" 
-                           onclick="status_vacancy({{job.id}})">
-                </td>
-            </tr>
+            {% include 'report/row_report.html' %}
             {% endfor %}
             {% endif %}
             </tbody>
         </table>
-        {% if parametrs.paginate %}{% include 'paginator.html' %}{% endif %}
+        {% if parametrs.paginate %}{% include 'report/paginator_report.html' %}{% endif %}
     </div><br>
 {% endblock %}
 

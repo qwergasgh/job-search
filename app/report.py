@@ -15,10 +15,13 @@ blueprint_report = Blueprint('blueprint_report',
 @login_required
 def report():
     query_search = request.args.get('query_search')
+    city=request.args.get('city')
+    state=request.args.get('state')
+    salary=request.args.get('salary')
     jobs_filter = get_jobs(dict(query=query_search,
-                                city=request.args.get('city'),
-                                state=request.args.get('state'),
-                                salary=request.args.get('salary')))
+                                city=city,
+                                state=state,
+                                salary=salary))
     count = jobs_filter.count()
     favorite_vacancies = {}
     if count > current_app.config['ROWS_PAGINATOR']:
@@ -31,10 +34,7 @@ def report():
                 id = job.id
                 favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id,
                                                             id_vacancy=id).first()
-                if favorite_vacancy is None:
-                    favorite_vacancies[id] = 'add'
-                else:
-                    favorite_vacancies[id] = 'delete'
+                favorite_vacancies[id] = 'add' if favorite_vacancy is None else 'delete'
     else:
         jobs = jobs_filter
         title = 'Searching results'
@@ -44,16 +44,16 @@ def report():
                 id = job.id
                 favorite_vacancy = Favorite.query.filter_by(id_user=current_user.id,
                                                             id_vacancy=id).first()
-                if favorite_vacancy is None:
-                    favorite_vacancies[id] = 'add'
-                else:
-                    favorite_vacancies[id] = 'delete'
+                favorite_vacancies[id] = 'add' if favorite_vacancy is None else 'delete'
     parametrs = {'query_search': query_search,
+                 'city': city,
+                 'state': state,
+                 'salary': salary,
                  'count': count, 
                  'paginate': paginate, 
                  'jobs': jobs, 
                  'favorite_vacancies': favorite_vacancies}
-    return render_template('report.html', parametrs=parametrs, title=title)
+    return render_template('report/report.html', parametrs=parametrs, title=title)
 
 
 

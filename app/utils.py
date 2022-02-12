@@ -9,9 +9,9 @@ import os
 
 
 
-def save_to_csv(vacancies, file):
+def save_to_csv(vacancies, file_name):
     try:
-        with open(file, mode='w', encoding='utf-8') as file:
+        with open(file_name, mode='w', encoding='utf-8') as file:
             writer = csv.writer(file)
             writer.writerow(['Title', 'Company', 'Salary', 'City', 'State', 'Link'])
             for vacancy in vacancies:
@@ -23,20 +23,18 @@ def save_to_csv(vacancies, file):
 
 
 def clear_tmp(user_name):
-    list_str = ['vacancies', 'favorites_vacancies']
+    list_str = ('vacancies', 'favorites_vacancies')
     for name in list_str:
         try:
-            file = os.path.abspath(os.path.dirname(__file__)) + f'/tmp/{name}_for_{user_name}.csv'
+            file = os.path.join(os.path.abspath(os.path.dirname(__file__)), \
+                   f'/tmp/{name}_for_{user_name}.csv')
             os.remove(file)
         except:
             continue
 
 
 def get_jobs(query_parametrs):
-    if query_parametrs['salary'] == '':
-        salary = 0
-    else:
-        salary = query_parametrs['salary']
+    salary = 0 if query_parametrs['salary'] == '' else query_parametrs['salary']
     jobs_filter = Job.query.search(query_parametrs['query']).filter(Job.salary >= salary)
     if query_parametrs['city'].strip() != '':
         jobs_filter = jobs_filter.filter(Job.city == query_parametrs['city'])

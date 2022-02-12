@@ -36,9 +36,7 @@ def vacancies():
 @login_required
 def favorites():
     vacancies_favorites = Favorite.query.filter_by(id_user=current_user.id)
-    id_list = []
-    for v in vacancies_favorites:
-        id_list.append(v.id_vacancy)
+    id_list = [v.id_vacancy for v in vacancies_favorites]
     jobs_filter = Job.query.filter(Job.id.in_(id_list))
     if len(id_list) > current_app.config['ROWS_PAGINATOR']:
         page = request.args.get('page', 1, type=int)
@@ -62,7 +60,6 @@ def add_vacancy():
         title_vacancy= request.form.get('title')
         company = request.form.get('company')
         salary = request.form.get('salary')
-        # location = request.form.get('location')
         city = request.form.get('city')
         state = request.form.get('state')
         source = request.form.get('source')
@@ -70,14 +67,12 @@ def add_vacancy():
         new_vacancy = Job(title=title_vacancy, 
                           company=company,
                           salary=salary,
-                          # location=location,
                           city=city,
                           state=state,
                           source=source,
                           link=link)
         db.session.add(new_vacancy)
         db.session.commit()
-        # search.update_index(Job)
         return redirect(url_for('blueprint_vacancies.vacancies'))
     return render_template('vacancies/add_vacancy.html', form=formJob, title=title)
 
