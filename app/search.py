@@ -17,8 +17,6 @@ def search():
     if form_search.validate_on_submit():
         return redirect(url_for('blueprint_report.report',
                                 query_search=request.form.get('query_search'),
-                                headhunter=request.form.get('headhunter'),
-                                stackoverflow=request.form.get('stackoverflow'),
                                 city=request.form.get('city'),
                                 state=request.form.get('state'),
                                 salary=request.form.get('salary')))
@@ -50,6 +48,7 @@ def progress():
     if percentage == 100:
         Parsing.filling_database()
         Parsing.update_percentage(0)
+        Parsing.vacancies.clear()
     return jsonify({'percentage': percentage}), 200
 
 

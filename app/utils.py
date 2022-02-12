@@ -38,18 +38,13 @@ def clear_tmp(user_name):
 
 
 def get_jobs(query_parametrs):
-    jobs_filter = Job.query.all()
-    # filter title ???
-    if query_parametrs.headhunter is True:
-        jobs_filter = jobs_filter.filter(Job.source == 'hh').all()
-    if query_parametrs.stackoverflow is True:
-        jobs_filter = jobs_filter.filter(Job.source == 'so').all()
-    if query_parametrs.city is not None:
-        jobs_filter = jobs_filter.filter(Job.city == query_parametrs.city).all()
-    if query_parametrs.state is not None:
-        jobs_filter = jobs_filter.filter(Job.state == query_parametrs.state).all()
-    if query_parametrs.salary is not None:
-        jobs_filter = jobs_filter.filter(Job.salary >= query_parametrs.salary).all()
+    jobs_filter = Job.query.search(query_parametrs['query']).all()
+    if query_parametrs['city'] is not None:
+        jobs_filter = jobs_filter.filter(Job.city == query_parametrs['city']).all()
+    if query_parametrs['state'] is not None:
+        jobs_filter = jobs_filter.filter(Job.state == query_parametrs['state']).all()
+    if query_parametrs['salary'] is not None:
+        jobs_filter = jobs_filter.filter(Job.salary >= query_parametrs['salary']).all()
     return jobs_filter
 
 

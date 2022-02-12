@@ -3,12 +3,14 @@ from flask_login import UserMixin
 from datetime import datetime
 from app import db, login, app
 import jwt
+from whoosh.analysis import StemmingAnalyzer
 # from .elasticsearch_functions import create_index, remove_index, query_index
 
 
 
+
 class TempJob(db.Model):
-    __tablename__ = 'temp_vacancies'
+    __tablename__ = 'TempJob'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80), nullable=False)
     company = db.Column(db.String(80), nullable=False)
@@ -27,9 +29,9 @@ class TempJob(db.Model):
 
 
 class User(db.Model, UserMixin):
-    __tablename__ = 'users'
+    __tablename__ = 'User'
     id = db.Column(db.Integer, primary_key=True)
-    role_id = db.Column(db.Integer, db.ForeignKey('roles.id'), nullable=False)
+    role_id = db.Column(db.Integer, db.ForeignKey('Role.id'), nullable=False)
     user_name = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(80), nullable=False)
     first_name = db.Column(db.String(80), nullable=False)
@@ -79,14 +81,14 @@ class User(db.Model, UserMixin):
 
 # many to many !!!
 class Favorite(db.Model):
-    __tablename__ = 'favorites'
+    __tablename__ = 'Favorite'
     id = db.Column(db.Integer, primary_key=True)
-    id_user = db.Column(db.Integer, db.ForeignKey('users.id'))
-    id_vacancy = db.Column(db.Integer, db.ForeignKey('vacancies.id'))
+    id_user = db.Column(db.Integer, db.ForeignKey('User.id'))
+    id_vacancy = db.Column(db.Integer, db.ForeignKey('Job.id'))
 
 
 class Role(db.Model):
-    __tablename__ = 'roles'
+    __tablename__ = 'Role'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), nullable=False)
     privilege = db.Column(db.Boolean, index=True)
@@ -145,8 +147,9 @@ def user_loader(user_id):
 
 # class Job(ElasticsearchMixin, db.Model):
 class Job(db.Model):
-    __tablename__ = 'vacancies'
+    __tablename__ = 'Job'
     __searchable__ = ['title']
+    __analyzer__ = StemmingAnalyzer()
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(80), nullable=False)
     company = db.Column(db.String(80), nullable=False)
@@ -160,3 +163,5 @@ class Job(db.Model):
 # @login.unauthorized_handler
 # def unauthorized_handler():
 #    return 'unauthorized'
+
+

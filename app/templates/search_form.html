@@ -29,17 +29,7 @@
         </div>
 
         <div class="mb-3 row align-items-center">
-            <div class="custom-control custom-switch col order-first">
-                {{ form_search.headhunter(id="check_hh_search", class="custom-control-input", type="checkbox", checked="y") }}
-                <label class="custom-control-label", for="check_hh_search">HeadHunter</label>
-            </div>
-
-            <div class="custom-control custom-switch col">
-                {{ form_search.stackoverflow(id="check_so_search", class="custom-control-input", type="checkbox") }}
-                <label class="custom-control-label", for="check_so_search">StackOverflow</label>
-            </div>
-
-            <div class="btn-group col order-last">
+            <div class="btn-group col"><!-- order-last">-->
                 <button type="reset" class="btn btn-outline-secondary">Clear</button>
                 {{ form_search.submit_search(id="search", class="btn btn-outline-secondary") }}
             </div>

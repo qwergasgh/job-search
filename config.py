@@ -1,11 +1,11 @@
 import os
 
 app_dir = os.path.abspath(os.path.dirname(__file__))
-
+basedir = os.path.join(app_dir + '/app/db_app.db')
 
 class BaseConfig:
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app_dir + '/app/db_app.db')
-    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SQLALCHEMY_TRACK_MODIFICATIONS = True
     QSLALCHEMY_COMMIT_ON_TEARDOWN = True
     SECRET_KEY = 'my_secret_key'
     DEBUG = True
@@ -18,3 +18,6 @@ class BaseConfig:
     # ELASTICSEARCH_URL = {"hosts": ["127.0.0.1:9200"]}
     ADMINS = ['admin@mail.com']
     ROWS_PAGINATOR = 20
+    WHOOSH_BASE = basedir
+    WHOOSH_ANALYZER = 'StemmingAnalyzer'
+    WHOOSH_INDEX_PATH = 'whooshSearch'

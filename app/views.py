@@ -63,3 +63,4 @@ def export():
             raise Exception()
     except:
         return redirect(url_for('blueprint_app.home'))
+

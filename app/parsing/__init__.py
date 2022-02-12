@@ -58,14 +58,12 @@ class Parsing():
                     temp_job = TempJob(title=vacancy['title'],
                                        company=vacancy['company'],
                                        salary=vacancy['salary'],
-                                       # location=vacancy['location'],
                                        city=vacancy['city'],
                                        state=vacancy['state'],
                                        link=vacancy['link'],
                                        source=vacancy['source'])
                     db.session.add(temp_job)
                 db.session.commit()
-                Parsing.vacancies.clear()
         except:
             return
 
@@ -158,7 +156,6 @@ class ParsingUtil():
         except:
             lock.acquire()
             Parsing.update_percentage(100)
-            Parsing.vacancies.clear()
             lock.release()
 
     def get_vacancies(self):

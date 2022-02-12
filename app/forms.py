@@ -76,8 +76,8 @@ class SearchForm(FlaskForm):
     city = StringField('City', validators=[DataRequired()])
     state = StringField('State', validators=[DataRequired()])
     salary = IntegerField('Salary', validators=[DataRequired()])
-    headhunter = BooleanField('HeadHunter')
-    stackoverflow = BooleanField('StackOverFlow')
+    # headhunter = BooleanField('HeadHunter')
+    # stackoverflow = BooleanField('StackOverFlow')
     submit_search = SubmitField('Search')
 
     def __init__(self, *args, **kwargs):
@@ -86,8 +86,8 @@ class SearchForm(FlaskForm):
     def validate(self):
         if self.query_search.data.strip() == "":
             return False
-        if self.headhunter.data is False and self.stackoverflow.data is False:
-            return False
+        # if self.headhunter.data is False and self.stackoverflow.data is False:
+        #     return False
         return True
 
 class ParsingForm(FlaskForm):
