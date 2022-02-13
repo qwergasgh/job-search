@@ -13,6 +13,11 @@
             Delete all
         </a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ url_for('blueprint_app.export', vacancies='all') }}">
+            <img src="{{ url_for('static', filename='img/csv.png') }}" alt="Save all to CSV" vspace="0" align="center" height="25px">
+        </a>
+    </li>
 {% endblock %}
 
 {% block page_content %}

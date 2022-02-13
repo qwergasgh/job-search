@@ -30,12 +30,13 @@
       {{ form.email(class="form-control forms-inputs", placeholder="Email") }}
     </div>
     <div class="mb-3">
-      <a  href={{ url_for('blueprint_user.reset_password') }}>Edit password</a>
+      <a  href="{{ url_for('blueprint_user.reset_password') }}">Edit password</a>
     </div>
-    <div align="right">
+    <div>
       {{ form.submit(class="btn btn-outline-secondary btn-block") }}
     </div>
     <br>
   </form>
 </div>
+<br>
 {% endblock %}

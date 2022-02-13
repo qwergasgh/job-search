@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import current_app, render_template
 from flask_mail import Message
 from app import db, mail, app
 from threading import Thread
@@ -23,11 +23,11 @@ def save_to_csv(vacancies, file_name):
 
 
 def clear_tmp(user_name):
-    list_str = ('vacancies', 'favorites_vacancies')
+    list_str = ('vacancies', 'favorites_vacancies', 'result')
     for name in list_str:
         try:
-            file = os.path.join(os.path.abspath(os.path.dirname(__file__)), \
-                   f'/tmp/{name}_for_{user_name}.csv')
+            file = os.path.join(current_app.config['TMP_DIR'], \
+                   f'{name}_for_{user_name}.csv')
             os.remove(file)
         except:
             continue

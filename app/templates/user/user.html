@@ -9,31 +9,33 @@
 <table class="table border">
     <tbody>
     <tr>
-    <td>First name:</td>
-    <td>{{ user.first_name }}</td>
+        <td>First name:</td>
+        <td>{{ user.first_name }}</td>
     </tr>
     <tr>
-    <td>Last name:</td>
-    <td>{{ user.last_name }}</td>
+        <td>Last name:</td>
+        <td>{{ user.last_name }}</td>
     </tr>
     <tr>
-    <td>Email:</td>
-    <td>{{ user.email }}</td>
+        <td>Email:</td>
+        <td>{{ user.email }}</td>
     </tr>
     <tr>
-    <td>Phonenumber:</td>
-    <td>{{ user.phonenumber }}</td>
+        <td>Phonenumber:</td>
+        <td>{{ user.phonenumber }}</td>
     </tr>
     <tr>
-    <td>Registration date:</td>
-    <td>{{ user.created }}</td>
+        <td>Registration date:</td>
+        <td>{{ user.created }}</td>
     </tr>
     </tbody>
 </table>
-    {% if user == current_user %}
-        <a class="btn btn-outline-secondary" href="{{ url_for('blueprint_user.edit_profile') }}">
-            Edit profile
-        </a>
-    {% endif %}
+{% if user == current_user %}
+<div class="mb-2 row align-items-center">
+    <a class="btn btn-outline-secondary" href="{{ url_for('blueprint_user.edit_profile') }}">
+        Edit profile
+    </a>
+</div>
+{% endif %}
 </div>
 {% endblock %}

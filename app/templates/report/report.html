@@ -2,7 +2,7 @@
 
 {% block save %}
     <li class="nav-item">
-        <a class="nav-link" href="{{ url_for('blueprint_app.export', vacancies='all') }}">
+        <a class="nav-link" href="{{ url_for('blueprint_app.export', vacancies='result', query_search=parametrs.query_search, city=parametrs.city, state=parametrs.state, salary=parametrs.salary) }}">
             <img src="{{ url_for('static', filename='img/csv.png') }}" alt="Save all to CSV" vspace="0" align="center" height="25px">
         </a>
     </li>
