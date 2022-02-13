@@ -5,7 +5,7 @@
 {% block page_content %}
 <br>
 <h1 class="h2 mb-3 font-weight-normal">{{ user.user_name }}</h1>
-<div class="container col-2">
+<div class="container col-4">
 <table class="table border">
     <tbody>
     <tr>
@@ -31,7 +31,7 @@
     </tbody>
 </table>
 {% if user == current_user %}
-<div class="mb-2 row align-items-center">
+<div class="col-12">
     <a class="btn btn-outline-secondary" href="{{ url_for('blueprint_user.edit_profile') }}">
         Edit profile
     </a>

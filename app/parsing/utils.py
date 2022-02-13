@@ -67,9 +67,9 @@ def generate_dict_vacancy(title, company, city, state, link, salary, source):
     if company is None:
         company = 'No company'
     if city is None:
-        city = 'No office city'
+        city = 'No city'
     if state is None:
-        state = 'No office state'
+        state = 'No state'
     return {'title': title,
             'company': company,
             'city': city,
