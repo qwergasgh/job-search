@@ -3,5 +3,9 @@
 {% block HOMEPAGE %} active {% endblock %}
 
 {% block page_content %}
-index
+<br>
+<h1 class="h2 mb-3 font-weight-normal">Welcome {{ current_user.user_name }}!</h1>
+<div class="text-center">
+    <img src="{{ url_for('static', filename='img/index.webp') }}" class="rounded">
+</div>
 {% endblock %}

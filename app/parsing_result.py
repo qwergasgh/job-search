@@ -23,7 +23,9 @@ def parsing_result():
         temp_jobs = TempJob.query.all()
         title = 'Parsing results'
         paginate = False
-    parametrs = {'paginate': paginate, 
+    parametrs = {'paginate': paginate,
+                 'param': False,
+                 'url': 'blueprint_parsing_result.parsing_result',
                  'jobs': temp_jobs,
                  'count': count}
     return render_template('parsing_result/parsing_result.html', title=title, parametrs=parametrs)

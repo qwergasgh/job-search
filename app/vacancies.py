@@ -27,7 +27,9 @@ def vacancies():
         paginate = False
     parametrs = {'jobs': jobs, 
                  'count': count, 
-                 'paginate': paginate}
+                 'paginate': paginate,
+                 'param': False,
+                 'url': 'blueprint_vacancies.vacancies'}
     return render_template('vacancies/vacancies.html', parametrs=parametrs, title=title)
 
 
@@ -47,7 +49,10 @@ def favorites():
         jobs = jobs_filter
         title = 'Favorites vacancies'
         paginate = False
-    parametrs = {'paginate': paginate, 'jobs': jobs}
+    parametrs = {'paginate': paginate, 
+                 'jobs': jobs,
+                 'param': False,
+                 'url': 'blueprint_vacancies.favorites'}
     return render_template('vacancies/favorites.html', parametrs=parametrs, title=title)
 
 

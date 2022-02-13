@@ -1,0 +1,49 @@
+<div align="right">
+    <a href="
+    {% if parametrs.param %}
+    {{ url_for(parametrs.url, query_search=parametrs.query_search, city=parametrs.city, state=parametrs.state, salary=parametrs.salary, page=parametrs.jobs.prev_num) }}
+    {% else %}
+    {{ url_for(parametrs.url, page=parametrs.jobs.prev_num) }}
+    {% endif %}"
+    class="btn btn-outline-secondary 
+    {% if parametrs.jobs.page == 1 %}disabled{% endif %}">
+        &laquo;
+    </a>
+    {% for page_num in parametrs.jobs.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {% if page_num %}
+            {% if parametrs.jobs.page == page_num %}
+            <a href="
+            {% if parametrs.param %}
+            {{ url_for(parametrs.url, query_search=parametrs.query_search, city=parametrs.city, state=parametrs.state, salary=parametrs.salary, page=page_num) }}
+            {% else %}
+            {{ url_for(parametrs.url, page=page_num) }}
+            {% endif %}" 
+            class="btn btn-outline-secondary">
+                    {{ page_num }}
+                </a>
+                {% else %}
+                <a href="
+                {% if parametrs.param %}
+                {{ url_for(parametrs.url, query_search=parametrs.query_search, city=parametrs.city, state=parametrs.state, salary=parametrs.salary, page=page_num) }}
+                {% else %}
+                {{ url_for(parametrs.url, page=page_num) }}
+                {% endif %}"       
+                class="btn btn-outline-secondary">
+                    {{ page_num }}
+                </a>
+            {% endif %}
+        {% else %}
+                ...
+        {% endif %}
+    {% endfor %}
+    <a href="
+    {% if parametrs.param %}
+    {{ url_for(parametrs.url, query_search=parametrs.query_search, city=parametrs.city, state=parametrs.state, salary=parametrs.salary, page=parametrs.jobs.next_num) }}
+    {% else %}
+    {{ url_for(parametrs.url, page=parametrs.jobs.next_num) }}
+    {% endif %}"
+    class="btn btn-outline-secondary
+    {% if parametrs.jobs.page == parametrs.jobs.pages %}disabled{% endif %}">
+        &raquo;
+    </a><br>
+</div>

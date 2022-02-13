@@ -2,8 +2,6 @@
 
 {% block VACANCIESPAGE %} active {% endblock %}
 
-{% if parametrs.jobs is not none %}
-
 {% block save %}
     <li class="nav-item">
         <a class="nav-link" href="{{ url_for('blueprint_vacancies.add_vacancy') }}">
@@ -50,20 +48,20 @@
             </thead>
             <tbody>
             {% if parametrs.paginate %}
-            {% for job in parametrs.jobs.items %}
-            {% include 'vacancies/row_vacancies.html' %}
-            {% endfor %}
+                {% for job in parametrs.jobs.items %}
+                    {% include 'vacancies/row_vacancies.html' %}
+                {% endfor %}
             {% else %}
-            {% for job in parametrs.jobs %}
-            {% include 'vacancies/row_vacancies.html' %}
-            {% endfor %}
+                {% for job in parametrs.jobs %}
+                    {% include 'vacancies/row_vacancies.html' %}
+                {% endfor %}
             {% endif %}
             </tbody>
         </table>
-        {% if parametrs.paginate %}{% include 'vacancies/paginator_vacancies.html' %}{% endif %}
+        {% if parametrs.paginate %}{% include 'base_paginator.html' %}{% endif %}
     </div><br>
 {% endblock %}
+
 {% block script %}
 <script src="{{ url_for('static', filename='js/vacancies.js') }}"></script>
 {% endblock %}
-{% endif %}

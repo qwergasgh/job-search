@@ -51,6 +51,8 @@ def report():
                  'salary': salary,
                  'count': count, 
                  'paginate': paginate, 
+                 'param': True,
+                 'url': 'blueprint_report.report',
                  'jobs': jobs, 
                  'favorite_vacancies': favorite_vacancies}
     return render_template('report/report.html', parametrs=parametrs, title=title)

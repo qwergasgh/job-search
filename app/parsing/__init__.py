@@ -162,7 +162,7 @@ class StackOverflow(ParsingUtil):
         title = html.find('h2').find('a').text.strip()
         company = html.find('h3').find_all('span')[0].text.strip()
         location = html.find('h3').find_all('span')[1].text.strip()
-        if location is not 'No office location' or None:
+        if location != 'No office location' or None:
             lock.acquire()
             city, state = get_location(location)
             lock.release()
