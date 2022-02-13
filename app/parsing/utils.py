@@ -39,10 +39,10 @@ class ParsingProxyParametrs():
     def _create_options(self):
         options = Options()
         options.binary_location = self.binary_path
-        # options.set_preference('network.proxy.type', 1)
-        # options.set_preference('network.proxy.socks', '127.0.0.1')
-        # options.set_preference('network.proxy.socks_port', 9050)
-        # options.set_preference("network.proxy.socks_remote_dns", True)
+        options.set_preference('network.proxy.type', 1)
+        options.set_preference('network.proxy.socks', '127.0.0.1')
+        options.set_preference('network.proxy.socks_port', 9050)
+        options.set_preference("network.proxy.socks_remote_dns", True)
         return options
 
     def close_tor(self):
