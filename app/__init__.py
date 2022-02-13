@@ -5,17 +5,29 @@ from flask_login import LoginManager
 from flask import Flask, current_app
 from config import BaseConfig
 from flask_mail import Mail
+import shutil
 import os
 
 
 
 def status_tmp():
-    with app.app_context():
-        if not os.path.isdir(current_app.config['TMP_DIR']):
-            try:
-                os.mkdir(current_app.config['TMP_DIR'])
-            except:
-                return
+    if not os.path.isdir(current_app.config['TMP_DIR']):
+        try:
+            os.mkdir(current_app.config['TMP_DIR'])
+        except:
+            return
+
+
+def clear_tmp():
+    try:
+        for filename in os.listdir(current_app.config['TMP_DIR']):
+            file_path = os.path.join(current_app.config['TMP_DIR'], filename)
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+    except:
+        return
 
 
 def create_blueprints():
@@ -59,7 +71,10 @@ login.session_protection = 'strong'
 
 create_blueprints()
 create_index()
-status_tmp()
+
+with app.app_context():
+    clear_tmp()
+    status_tmp()
 
 login.login_view = 'blueprint_user.login'
 
