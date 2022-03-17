@@ -2,6 +2,7 @@ from .forms import LoginForm, EditProfileForm, ResetPasswordForm, ResetPasswordF
 from flask_login.utils import login_required, login_user, logout_user, current_user
 from flask import Blueprint, render_template, request, redirect, url_for, abort
 from .utils import clear_tmp, send_password_reset_email
+from .forms import RegisterForm
 from .models import User
 from app import db
 
