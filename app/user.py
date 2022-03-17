@@ -21,6 +21,22 @@ def login():
             login_user(user)
             return redirect(url_for('blueprint_app.home'))
     return render_template('user/login.html', title='Login', form=form)
+  
+
+@blueprint_user.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        user = User(email=form.email.data, 
+                    user_name=form.user_name.data,
+                    first_name=form.first_name.data, 
+                    last_name=form.last_name.data,
+                    phonenumber=form.phonenumber.data, 
+                    password=form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('blueprint_user.login'))
+    return render_template('register.html', title='Register', form=form)  
 
 
 @blueprint_user.route('/logout')
