@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify, current_app
 from flask_login.utils import login_required, current_user
-from app.forms import JobForm
 from app.models import Job, Favorite
+from app.forms import JobForm
 from app import db
 import os
 
