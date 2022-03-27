@@ -2,7 +2,6 @@ from flask import current_app, render_template
 from flask_mail import Message
 from app import db, mail, app
 from threading import Thread
-from sqlalchemy import and_
 from .models import Job
 import csv
 import os
